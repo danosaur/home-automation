@@ -1,0 +1,1 @@
+"%JAVA_HOME%\bin\java.exe" -Djava.library.path="D:\dev\RxTx\rxtx-2.1-7-bins-r2\rxtx-2.1-7-bins-r2\Windows\i368-mingw32" -jar "%~dp0\..\rgb-controller\target\controller-test.jar" %1 %2 %3

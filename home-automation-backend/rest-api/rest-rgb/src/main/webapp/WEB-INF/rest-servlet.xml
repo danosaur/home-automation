@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<!-- Locates all the Controllers based on the annotations. -->
+	<context:component-scan base-package="com.dpingin.home.automation.rgb.app.impl.controller"/>
+
+	<context:annotation-config/>
+
+	<!--Maps incoming requests to the appropriate controller based on the annotations on the controller methods.-->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+					<property name="supportedMediaTypes" value="application/json"/>
+					<property name="objectMapper">
+						<bean class="org.codehaus.jackson.map.ObjectMapper"/>
+					</property>
+				</bean>
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- The Jackson view that uses the Jackson object mapper for serialization. -->
+	<bean id="restJsonMarshalView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+		<property name="modelKeys">
+			<set>
+				<value>response</value>
+			</set>
+		</property>
+	</bean>
+
+    <bean id="rs232ControllerBean" class="com.dpingin.home.automation.rgb.controller.impl.rs232.RS232ControllerImpl"/>
+
+    <bean id="rgbControllerBean" class="com.dpingin.home.automation.rgb.controller.impl.rgb.RgbControllerImpl" init-method="init" destroy-method="destroy">
+        <property name="rs232Controller" ref="rs232ControllerBean"/>
+        <property name="portName" value="COM2"/>
+    </bean>
+</beans>

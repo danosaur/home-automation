@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <bean id="rs232ControllerBean" class="com.dpingin.home.automation.rgb.controller.impl.rs232.RS232ControllerImpl"/>
+
+    <bean id="rgbControllerBean" class="com.dpingin.home.automation.rgb.controller.impl.rgb.RgbControllerImpl" init-method="init" destroy-method="destroy">
+        <property name="rs232Controller" ref="rs232ControllerBean"/>
+        <property name="portName" value="COM2"/>
+    </bean>
+
+    <bean name="rgbSequencePlayerBean" class="com.dpingin.home.automation.rgb.controller.impl.rgb.sequence.player.RgbSequencePlayerImpl">
+        <constructor-arg>
+            <list>
+                <ref bean="strobeRgbSequenceBean"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <task:scheduler id="taskSchedulerBean" pool-size="1"/>
+
+    <bean name="strobeRgbSequenceBean" class="com.dpingin.home.automation.rgb.controller.impl.rgb.sequence.StrobeRgbSequence">
+        <property name="frequency" value="10"/>
+        <property name="color">
+            <bean class="com.dpingin.home.automation.rgb.controller.api.color.Color">
+                <property name="r" value="255"/>
+                <property name="g" value="255"/>
+                <property name="b" value="255"/>
+            </bean>
+        </property>
+        <property name="rgbController" ref="rgbControllerBean"/>
+        <property name="taskScheduler" ref="taskSchedulerBean"/>
+    </bean>
+
+</beans>
