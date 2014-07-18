@@ -7,6 +7,8 @@ import com.dpingin.home.automation.rgb.controller.api.rs232.RS232Controller;
 import com.dpingin.home.automation.rgb.controller.api.rs232.RS232ControllerException;
 import com.dpingin.home.automation.rgb.controller.util.CrcUtils;
 import com.dpingin.home.automation.rgb.controller.util.HexUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.Set;
@@ -20,6 +22,8 @@ import java.util.Set;
  */
 public class RgbControllerImpl implements RgbController
 {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     protected String portName;
     protected RS232Controller rs232Controller;
     protected Color color = Color.BLACK;
@@ -76,7 +80,7 @@ public class RgbControllerImpl implements RgbController
     {
         Assert.notNull(color, "Color can not be null");
 
-        setColor(color.getR(), color.getG(), color.getB());
+        setColor(color.getRed(), color.getGreen(), color.getBlue());
     }
 
     @Override
@@ -85,6 +89,8 @@ public class RgbControllerImpl implements RgbController
         Assert.state(r >= 0 && r < 256, "R must be in range [0..255]");
         Assert.state(g >= 0 && g < 256, "G must be in range [0..255]");
         Assert.state(b >= 0 && b < 256, "B must be in range [0..255]");
+
+        log.debug("Setting color: {}, {}, {}", r, g, b);
 
         try
         {

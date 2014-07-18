@@ -208,7 +208,7 @@ public class RgbControllerCommandLine
 
     protected static boolean setColor(Color color)
     {
-        return setColor(color.getR(), color.getG(), color.getB());
+        return setColor(color.getRed(), color.getGreen(), color.getBlue());
     }
 
     protected static boolean setColor(int r, int g, int b)

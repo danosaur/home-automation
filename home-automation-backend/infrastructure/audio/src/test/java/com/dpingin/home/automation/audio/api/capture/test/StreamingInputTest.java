@@ -1,11 +1,11 @@
 package com.dpingin.home.automation.audio.api.capture.test;
 
+import com.dpingin.home.automation.audio.impl.tools.WindowFunction;
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbController;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
 import ddf.minim.AudioInput;
 import ddf.minim.AudioListener;
-import ddf.minim.AudioSample;
 import ddf.minim.Minim;
 import ddf.minim.analysis.FFT;
 import org.jtransforms.fft.FloatFFT_1D;
@@ -20,6 +20,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sound.sampled.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,75 +34,155 @@ import javax.sound.sampled.*;
 @ContextConfiguration("classpath:/StreamingInputTest-context.xml")
 public class StreamingInputTest
 {
+    private Logger log = LoggerFactory.getLogger(getClass());
+
     @Autowired
     RgbController rgbController;
-    private Logger log = LoggerFactory.getLogger(getClass());
+
+    protected int bufferSize = 1024;
+
+    protected int windowSize = 24;
+    protected boolean useHalfWindow = true;
+
+    protected float minBrightness = 0.3f;
+    protected float maxBrightness = 0.3f;
+
+    protected boolean dynamicValue = false;
 
     @Test
     public void minimTest() throws RgbControllerException
     {
         Minim minim = new Minim(this);
         minim.debugOn();
-        AudioInput lineIn = minim.getLineIn();
+        final AudioInput lineIn = minim.getLineIn(Minim.MONO, bufferSize);
 
-        AudioSample sample = minim.createSample(null, null);
-        sample.addListener(new AudioListener()
+        log.info("Buffer size {}", lineIn.bufferSize());
+
+        final FFT fft = new FFT(lineIn.bufferSize(), lineIn.sampleRate());
+        fft.window(FFT.HAMMING);
+
+        WindowFunction windowFunction = new WindowFunction();
+        windowFunction.setWindowType(WindowFunction.BLACKMAN);
+        final double[] window = windowFunction.generate(useHalfWindow ? windowSize * 2 : windowSize);
+
+//        for (int i = 0; i < 5; i++)
+//        {
+//            windowFunction.setWindowType(i);
+//            double[] testWindow = windowFunction.generate(windowSize);
+//            log.debug("Window[{}] {}", i, testWindow);
+//        }
+
+        lineIn.addListener(new AudioListener()
         {
+            private float maxLows = 0f;
+            private float maxMids = 0f;
+            private float maxHighs = 0f;
+
+            List<Color> prevColors = new LinkedList();
+
             @Override
             public void samples(float[] samp)
             {
-                //To change body of implemented methods use File | Settings | File Templates.
+                try
+                {
+                    processBuffer(samp);
+                } catch (RgbControllerException e)
+                {
+                    log.error(e.getMessage(), e);
+                }
             }
 
             @Override
             public void samples(float[] sampL, float[] sampR)
             {
-                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            private void processBuffer(float[] samples) throws RgbControllerException
+            {
+//                log.debug("Sample count: {}", samples.length);
+//                log.trace("Samples: {}", samples);
+
+                fft.forward(samples);
+
+                float avgLows = fft.calcAvg(0f, 60f);
+                float avgHighs = fft.calcAvg(10000f, 20000f);
+                float avgMids = fft.calcAvg(500f, 8000f);
+
+                if (avgLows > maxLows)
+                    maxLows = avgLows;
+                if (avgMids > maxMids)
+                    maxMids = avgMids;
+                if (avgHighs > maxHighs)
+                    maxHighs = avgHighs;
+
+                float lows = (maxLows - avgLows) / maxLows;
+                float mids = (maxMids - avgMids) / maxMids;
+                float highs = (maxHighs - avgHighs) / maxHighs;
+
+//                Color color = Color.fromHSB(mids, highs, lows);
+                Color color = new Color((1f - lows) * 255f, (1f - mids) * 255f, (1f - highs) * 255f);
+
+                if (color.getBrightness() < minBrightness)
+                    color.setBrightness(minBrightness);
+                if (color.getBrightness() > maxBrightness)
+                    color.setBrightness(minBrightness);
+
+                if (dynamicValue)
+                {
+                    float value = color.getValue();
+                    value *= lows;
+                    color.setValue(value);
+                }
+
+                log.debug("MaxLMH: {} {} {}", maxLows, maxMids, maxHighs);
+                log.debug("LMH: {} {} {}", lows, mids, highs);
+                log.debug("RGB: {} {} {}", color.getRed(), color.getGreen(), color.getBlue());
+                log.debug("HSV: {} {} {}", color.getHue(), color.getSaturation(), color.getValue());
+                log.debug("Brightness: {}", color.getBrightness());
+                log.debug("Window: {}", window);
+
+                if (prevColors.size() < windowSize)
+                {
+                    prevColors.add(color);
+                }
+                else
+                {
+                    if (prevColors.size() > 0)
+                        prevColors.remove(0);
+                    prevColors.add(color);
+                    float rSum = 0;
+                    float gSum = 0;
+                    float bSum = 0;
+                    for (int i = 0; i < windowSize; i++)
+                    {
+                        Color prevColor = prevColors.get(i);
+                        rSum += window[i] * prevColor.getRed();
+                        gSum += window[i] * prevColor.getGreen();
+                        bSum += window[i] * prevColor.getBlue();
+                    }
+                    color = new Color(Math.round(rSum / prevColors.size()), Math.round(gSum / prevColors.size()), Math.round(bSum / prevColors.size()));
+                    rgbController.setColor(color);
+                }
             }
         });
 
-        FFT fft = new FFT(lineIn.bufferSize(), lineIn.sampleRate());
-
-        float maxLows = 0f;
-        float maxMids = 0f;
-        float maxHighs = 0f;
+        long startTime = System.currentTimeMillis();
         while (true)
         {
-            fft.forward(lineIn.mix);
-            fft.window(FFT.HAMMING);
+            if (System.currentTimeMillis() - startTime > 100000000)
+                break;
 
-            float avgLows = fft.calcAvg(0f, 100f);
-            float avgHighs = fft.calcAvg(5000f, 20000f);
-            float avgMids = fft.calcAvg(500f, 4000f);
-
-            if (avgLows > maxLows)
-                maxLows = avgLows;
-            if (avgMids > maxMids)
-                maxMids = avgMids;
-            if (avgHighs > maxHighs)
-                maxHighs = avgHighs;
-
-            float h = (maxMids - avgMids) * (float)Math.PI / maxMids;
-            float s = (maxHighs - avgHighs) / maxHighs;
-            float v = (maxLows - avgLows) / maxLows;
-            Color color = Color.fromHSB(h, s, v);
-
-            log.info("avgLows: " + avgLows + ", maxLows: " + maxLows + ", v: " + v);
-            log.info("avgMids: " + avgMids + ", maxMids: " + maxMids + ", h: " + h);
-            log.info("avgHighs: " + avgHighs + ", maxHighs: " + maxHighs + ", s: " + s);
-
-            rgbController.setColor(color);
-
-//            try
-//            {
-//                Thread.sleep(20);
-//            } catch (InterruptedException e)
-//            {
-//            }
+            try
+            {
+                Thread.sleep(100);
+            } catch (InterruptedException e)
+            {
+            }
         }
 
-//        lineIn.close();
-//        minim.stop();
+        rgbController.setColor(Color.BLACK);
+        lineIn.close();
+        minim.stop();
     }
 
     @Test
