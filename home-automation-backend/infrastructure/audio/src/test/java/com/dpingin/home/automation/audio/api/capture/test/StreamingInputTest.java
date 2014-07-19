@@ -41,11 +41,11 @@ public class StreamingInputTest
 
     protected int bufferSize = 1024;
 
-    protected int windowSize = 24;
+    protected int windowSize = 48;
     protected boolean useHalfWindow = true;
 
-    protected float minBrightness = 0.3f;
-    protected float maxBrightness = 0.3f;
+    protected float minBrightness = 0.2f;
+    protected float maxBrightness = 0.2f;
 
     protected boolean dynamicValue = false;
 

@@ -47,9 +47,18 @@
             });
         }
 
-        getColor(cw.color);
+        selectColor = function (color) {
+            var c = {
+                r: color.red,
+                g: color.green,
+                b: color.blue
+            };
+            cw.color(c);
+        };
+
+        getColor(selectColor);
         setInterval(function () {
-            getColor(cw.color);
+            getColor(selectColor);
         }, 3000);
         cw.onchange(setColor);
     </script>
