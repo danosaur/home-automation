@@ -39,15 +39,38 @@ public class StreamingInputTest
     @Autowired
     RgbController rgbController;
 
+    protected Mode mode = Mode.RGB;
+
     protected int bufferSize = 1024;
 
-    protected int windowSize = 48;
+    protected int windowSize = 32;
     protected boolean useHalfWindow = true;
 
-    protected float minBrightness = 0.2f;
-    protected float maxBrightness = 0.2f;
+    protected float minBrightness = 0.0f;
+    protected float maxBrightness = 1.0f;
 
     protected boolean dynamicValue = false;
+
+    protected float gain = 0.4f;
+
+    protected boolean applyLMHScale = false;
+
+    protected float lowsGain = 0.012f;
+    protected float midsGain = 0.5f;
+    protected float highsGain = 2.5f;
+
+    float maxLows = 0f;
+    float maxMids = 0f;
+    float maxHighs = 0f;
+
+    protected long runTimeSeconds = 60 * 60 * 60;
+
+    protected float lowsFrequencyFrom = 0f;
+    protected float lowsFrequencyTo = 200f;
+    protected float midsFrequencyFrom = 500f;
+    protected float midsFrequencyTo = 8000f;
+    protected float highsFrequencyFrom = 10000f;
+    protected float highsFrequencyTo = 20000f;
 
     @Test
     public void minimTest() throws RgbControllerException
@@ -74,10 +97,6 @@ public class StreamingInputTest
 
         lineIn.addListener(new AudioListener()
         {
-            private float maxLows = 0f;
-            private float maxMids = 0f;
-            private float maxHighs = 0f;
-
             List<Color> prevColors = new LinkedList();
 
             @Override
@@ -102,11 +121,24 @@ public class StreamingInputTest
 //                log.debug("Sample count: {}", samples.length);
 //                log.trace("Samples: {}", samples);
 
+                //Apply gain scale
+                for (int i = 0; i < samples.length; i++)
+                    samples[i] = samples[i] * gain;
+
                 fft.forward(samples);
 
-                float avgLows = fft.calcAvg(0f, 60f);
-                float avgHighs = fft.calcAvg(10000f, 20000f);
-                float avgMids = fft.calcAvg(500f, 8000f);
+                float rawAvgLows = fft.calcAvg(lowsFrequencyFrom, lowsFrequencyTo);
+                float avgLows = rawAvgLows * lowsGain;
+
+                float rawAvgMids = fft.calcAvg(midsFrequencyFrom, midsFrequencyTo);
+                float avgMids = rawAvgMids * midsGain;
+
+                float rawAvgHighs = fft.calcAvg(highsFrequencyFrom, highsFrequencyTo);
+                float avgHighs = rawAvgHighs * highsGain;
+
+                float lows = avgLows;
+                float mids = avgMids;
+                float highs = avgHighs;
 
                 if (avgLows > maxLows)
                     maxLows = avgLows;
@@ -115,17 +147,27 @@ public class StreamingInputTest
                 if (avgHighs > maxHighs)
                     maxHighs = avgHighs;
 
-                float lows = (maxLows - avgLows) / maxLows;
-                float mids = (maxMids - avgMids) / maxMids;
-                float highs = (maxHighs - avgHighs) / maxHighs;
+                if (applyLMHScale)
+                {
+                    lows = (maxLows - lows) / maxLows;
+                    mids = (maxMids - mids) / maxMids;
+                    highs = (maxHighs - highs) / maxHighs;
+                }
 
-//                Color color = Color.fromHSB(mids, highs, lows);
-                Color color = new Color((1f - lows) * 255f, (1f - mids) * 255f, (1f - highs) * 255f);
+                float lowsClipped = lows <= 1f ? lows : 1f;
+                float midsClipped = mids <= 1f ? mids : 1f;
+                float highsClipped = highs <= 1f ? highs : 1f;
+
+                Color color;
+                if (mode == Mode.HSB)
+                    color = Color.fromHSB(midsClipped, highsClipped, lowsClipped);
+                else
+                    color = new Color(lowsClipped * 255f, midsClipped * 255f, highsClipped * 255f);
 
                 if (color.getBrightness() < minBrightness)
                     color.setBrightness(minBrightness);
                 if (color.getBrightness() > maxBrightness)
-                    color.setBrightness(minBrightness);
+                    color.setBrightness(maxBrightness);
 
                 if (dynamicValue)
                 {
@@ -134,7 +176,8 @@ public class StreamingInputTest
                     color.setValue(value);
                 }
 
-                log.debug("MaxLMH: {} {} {}", maxLows, maxMids, maxHighs);
+                log.debug("LMH Raw: {} {} {}", rawAvgLows, rawAvgMids, rawAvgHighs);
+                log.debug("LMH Max: {} {} {}", maxLows, maxMids, maxHighs);
                 log.debug("LMH: {} {} {}", lows, mids, highs);
                 log.debug("RGB: {} {} {}", color.getRed(), color.getGreen(), color.getBlue());
                 log.debug("HSV: {} {} {}", color.getHue(), color.getSaturation(), color.getValue());
@@ -142,9 +185,7 @@ public class StreamingInputTest
                 log.debug("Window: {}", window);
 
                 if (prevColors.size() < windowSize)
-                {
                     prevColors.add(color);
-                }
                 else
                 {
                     if (prevColors.size() > 0)
@@ -169,7 +210,7 @@ public class StreamingInputTest
         long startTime = System.currentTimeMillis();
         while (true)
         {
-            if (System.currentTimeMillis() - startTime > 100000000)
+            if (System.currentTimeMillis() - startTime > runTimeSeconds * 100)
                 break;
 
             try
@@ -185,103 +226,9 @@ public class StreamingInputTest
         minim.stop();
     }
 
-    @Test
-    @Ignore
-    public void dataLineTest() throws LineUnavailableException, RgbControllerException
+    public enum Mode
     {
-        float sampleRate = 48000f;
-        AudioFormat audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, sampleRate, 16, 1, 2, sampleRate, false);
-
-        DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
-        TargetDataLine dataLine;
-
-        dataLine = (TargetDataLine) AudioSystem.getLine(info);
-
-        try
-        {
-            dataLine.open(audioFormat);
-
-            dataLine.addLineListener(new LineListener()
-            {
-                @Override
-                public void update(LineEvent event)
-                {
-                    log.info("A new line event occurred: " + event.toString());
-                }
-            });
-
-            dataLine.start();
-
-            int sampleCount = 256;
-
-            FloatFFT_1D fft = new FloatFFT_1D(sampleCount);
-
-            int frameSize = dataLine.getFormat().getFrameSize();
-
-            Assert.assertEquals(2, frameSize);
-
-            int bufferSize = frameSize * sampleCount;
-            byte[] buffer = new byte[bufferSize];
-            while (true)
-            {
-                int bytesRead = dataLine.read(buffer, 0, bufferSize);
-
-                float[] data = new float[sampleCount * 2];
-                for (int i = 0; i < bytesRead; i += 2)
-                {
-                    short intSample = (short) (((buffer[i] & 0xFF) << 8) | (buffer[i + 1] & 0xFF));
-//                    int intSample = (buffer[i]) | ((buffer[i + 1]) * 256);
-
-
-                    data[i * 2 / frameSize] = (float) intSample / 65536 / 2;
-                    data[i * 2 / frameSize + 1] = 0f;
-                }
-
-                fft.complexForward(data);
-
-                float[] values = new float[data.length / 2];
-                for (int i = 0; i < values.length; i++)
-                {
-                    float real = data[i];
-                    float img = data[i + 1];
-
-                    float value = (float) Math.sqrt(real * real + img * img);
-                    values[i] = value;
-                }
-
-                float binWidth = (sampleRate / 2f) / (sampleCount / 2);
-                float lpFrequency = 100f;
-                float sum = 0f;
-                int count = 0;
-                for (int i = 0; i < values.length; i++)
-                {
-                    //LP
-                    if (binWidth * i < lpFrequency)
-                    {
-                        sum += values[i];
-                        count++;
-                    }
-                }
-                float avg = sum / count;
-
-                int r = (int) avg;
-                if (r > 255)
-                    r = 255;
-                if (r < 0)
-                    r = 0;
-
-                log.info("Avg: " + avg);
-                log.info("R: " + r);
-
-                rgbController.setColor(r, 0, 0);
-            }
-        } finally
-        {
-            if (dataLine.isRunning())
-                dataLine.stop();
-            if (dataLine.isOpen())
-                dataLine.close();
-        }
-
+        RGB,
+        HSB
     }
 }

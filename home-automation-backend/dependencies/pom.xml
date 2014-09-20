@@ -13,6 +13,5 @@
     <packaging>pom</packaging>
     <modules>
         <module>minim</module>
-        <module>processing</module>
     </modules>
 </project>
