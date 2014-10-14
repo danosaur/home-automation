@@ -4,4 +4,55 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="rest.controller.properties"/>
+    </bean>
+
+    <bean id="rgbController" class="com.dpingin.home.automation.rgb.controller.impl.rgb.RgbControllerImpl" init-method="init" destroy-method="destroy">
+        <property name="rs232Controller">
+            <bean class="com.dpingin.home.automation.rgb.controller.impl.rs232.RS232ControllerImpl"/>
+        </property>
+        <property name="portName" value="${rgb.controller.portName}"/>
+    </bean>
+
+    <bean id="threeBandColorGeneratorSampleProcessor" class="com.dpingin.home.automation.audio.impl.sample.processor.SpectrumColorSampleProcessor">
+    </bean>
+
+    <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
+        <property name="size" value="#{${minim.audio.input.color.pattern.buffer.size}}"/>
+    </bean>
+
+    <bean id="minimAudioInputColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.MinimAudioInputColorPattern" init-method="init" destroy-method="destroy">
+        <property name="name" value="${minim.audio.input.color.pattern.name}"/>
+        <property name="rgbController" ref="rgbController"/>
+        <property name="sampleProcessor" ref="threeBandColorGeneratorSampleProcessor"/>
+        <property name="sampleBuffer" ref="sampleBuffer"/>
+    </bean>
+
+    <bean id="staticColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.StaticColorPattern" init-method="init" destroy-method="destroy">
+        <property name="name" value="${static.color.pattern.name}"/>
+        <property name="rgbController" ref="rgbController"/>
+    </bean>
+
+    <bean id="blackColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.BlackColorPattern" init-method="init" destroy-method="destroy">
+        <property name="name" value="${black.color.pattern.name}"/>
+        <property name="rgbController" ref="rgbController"/>
+    </bean>
+
+    <bean id="strobeColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.StrobeColorPattern" init-method="init" destroy-method="destroy">
+        <property name="name" value="${strobe.color.pattern.name}"/>
+        <property name="rgbController" ref="rgbController"/>
+    </bean>
+
+    <bean id="patternSwitcher" class="com.dpingin.home.automation.audio.impl.pattern.switcher.PatternSwitcherImpl">
+        <property name="patterns">
+            <list>
+                <ref bean="minimAudioInputColorPattern"/>
+                <ref bean="staticColorPattern"/>
+                <ref bean="blackColorPattern"/>
+                <ref bean="strobeColorPattern"/>
+            </list>
+        </property>
+    </bean>
+
 </beans>

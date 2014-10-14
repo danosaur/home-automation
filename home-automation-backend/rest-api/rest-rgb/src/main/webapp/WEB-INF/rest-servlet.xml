@@ -36,11 +36,4 @@
 			</set>
 		</property>
 	</bean>
-
-    <bean id="rs232ControllerBean" class="com.dpingin.home.automation.rgb.controller.impl.rs232.RS232ControllerImpl"/>
-
-    <bean id="rgbControllerBean" class="com.dpingin.home.automation.rgb.controller.impl.rgb.RgbControllerImpl" init-method="init" destroy-method="destroy">
-        <property name="rs232Controller" ref="rs232ControllerBean"/>
-        <property name="portName" value="COM2"/>
-    </bean>
 </beans>

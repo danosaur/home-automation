@@ -144,4 +144,28 @@ public class Color
     {
         return (float)Math.sqrt(.241f * r / 255f + .691f * g / 255f + .068f * b / 255f);
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof Color)) return false;
+
+        Color color = (Color) o;
+
+        if (Float.compare(color.b, b) != 0) return false;
+        if (Float.compare(color.g, g) != 0) return false;
+        if (Float.compare(color.r, r) != 0) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = (r != +0.0f ? Float.floatToIntBits(r) : 0);
+        result = 31 * result + (g != +0.0f ? Float.floatToIntBits(g) : 0);
+        result = 31 * result + (b != +0.0f ? Float.floatToIntBits(b) : 0);
+        return result;
+    }
 }

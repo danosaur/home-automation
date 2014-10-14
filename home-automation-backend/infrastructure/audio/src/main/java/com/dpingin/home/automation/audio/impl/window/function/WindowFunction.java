@@ -1,4 +1,7 @@
-package com.dpingin.home.automation.audio.impl.tools;
+package com.dpingin.home.automation.audio.impl.window.function;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -7,24 +10,39 @@ package com.dpingin.home.automation.audio.impl.tools;
  * Time: 02:11
  * To change this template use File | Settings | File Templates.
  */
-public class WindowFunction {
+public class WindowFunction
+{
+    private final Logger log = LoggerFactory.getLogger(WindowFunction.class);
 
     public static final int RECTANGULAR = 0;
     public static final int BARTLETT = 1;
     public static final int HANNING = 2;
     public static final int HAMMING = 3;
     public static final int BLACKMAN = 4;
-
     int windowType = 0; // defaults to rectangular window
 
-    public WindowFunction() {
+    public WindowFunction()
+    {
     }
 
-    public void setWindowType(int wt) {
+    public void setWindowType(int wt)
+    {
         windowType = wt;
     }
 
-    public void setWindowType(String w) {
+    public WindowFunction windowType(final int windowType)
+    {
+        this.windowType = windowType;
+        return this;
+    }
+
+    public int getWindowType()
+    {
+        return windowType;
+    }
+
+    public void setWindowType(String w)
+    {
         if (w.toUpperCase().equals("RECTANGULAR"))
             windowType = RECTANGULAR;
         if (w.toUpperCase().equals("BARTLETT"))
@@ -37,18 +55,16 @@ public class WindowFunction {
             windowType = BLACKMAN;
     }
 
-    public int getWindowType() {
-        return windowType;
-    }
-
-    public double[] generate(int nSamples) {
+    public double[] generate(int nSamples)
+    {
         // generate nSamples window function values
         // for index values 0 .. nSamples - 1
         int m = nSamples / 2;
         double r;
         double pi = Math.PI;
         double[] w = new double[nSamples];
-        switch (windowType) {
+        switch (windowType)
+        {
             case BARTLETT: // Bartlett (triangular) window
                 for (int n = 0; n < nSamples; n++)
                     w[n] = 1.0f - Math.abs(n - m) / m;
@@ -73,6 +89,14 @@ public class WindowFunction {
                 for (int n = 0; n < nSamples; n++)
                     w[n] = 1.0f;
         }
+
+        for (int i = 0; i < 5; i++)
+        {
+            setWindowType(i);
+            double[] testWindow = generate(nSamples);
+            log.trace("Generated window[{}] {}", i, testWindow);
+        }
+
         return w;
     }
 }
