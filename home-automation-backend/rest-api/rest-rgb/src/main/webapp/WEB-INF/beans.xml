@@ -15,18 +15,56 @@
         <property name="portName" value="${rgb.controller.portName}"/>
     </bean>
 
-    <bean id="threeBandColorGeneratorSampleProcessor" class="com.dpingin.home.automation.audio.impl.sample.processor.SpectrumColorSampleProcessor">
+    <bean id="defaultPatternName" class="java.lang.String">
+        <constructor-arg value="${minim.audio.input.color.pattern.name}"/>
     </bean>
 
-    <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
-        <property name="size" value="#{${minim.audio.input.color.pattern.buffer.size}}"/>
+    <bean id="audioInputProvider" class="com.dpingin.home.automation.audio.impl.minim.audio.input.AudioInputProviderImpl" init-method="init" destroy-method="destroy">
+        <property name="audioInputBufferSize" value="#{${audio.input.buffer.size}}"/>
     </bean>
 
-    <bean id="minimAudioInputColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.MinimAudioInputColorPattern" init-method="init" destroy-method="destroy">
+    <bean id="threeBandColorGeneratorSampleProcessor" class="com.dpingin.home.automation.audio.impl.sample.processor.SpectrumColorSampleProcessor" init-method="init">
+    </bean>
+
+    <bean id="beatDetectorSampleProcessor" class="com.dpingin.home.automation.audio.impl.sample.processor.BeatDetectorSampleProcessor">
+    </bean>
+
+    <bean id="minimAudioInputColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.AudioInputColorPattern" init-method="init" destroy-method="destroy">
         <property name="name" value="${minim.audio.input.color.pattern.name}"/>
         <property name="rgbController" ref="rgbController"/>
+        <property name="audioInputProvider" ref="audioInputProvider"/>
         <property name="sampleProcessor" ref="threeBandColorGeneratorSampleProcessor"/>
-        <property name="sampleBuffer" ref="sampleBuffer"/>
+        <property name="sampleBuffer">
+            <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
+                <property name="size" value="#{${minim.audio.input.color.pattern.buffer.size}}"/>
+            </bean>
+        </property>
+        <property name="controls">
+            <bean id="controls" class="com.dpingin.home.automation.audio.impl.pattern.control.TreeMapControlsImpl">
+                <constructor-arg name="collection">
+                    <list>
+                        <bean id="gainControl" class="com.dpingin.home.automation.audio.impl.pattern.control.FloatControl" init-method="init" destroy-method="destroy">
+                            <property name="name" value="gain"/>
+                            <property name="minimumValue" value="0"/>
+                            <property name="maximumValue" value="1"/>
+                            <property name="defaultValue" value="0.4"/>
+                        </bean>
+                    </list>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="beatDetectorAudioInputColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.AudioInputColorPattern" init-method="init" destroy-method="destroy">
+        <property name="name" value="${beat.color.pattern.name}"/>
+        <property name="rgbController" ref="rgbController"/>
+        <property name="audioInputProvider" ref="audioInputProvider"/>
+        <property name="sampleProcessor" ref="beatDetectorSampleProcessor"/>
+        <property name="sampleBuffer">
+            <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
+                <property name="size" value="#{${beat.color.pattern.buffer.size}}"/>
+            </bean>
+        </property>
     </bean>
 
     <bean id="staticColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.StaticColorPattern" init-method="init" destroy-method="destroy">
@@ -51,6 +89,7 @@
                 <ref bean="staticColorPattern"/>
                 <ref bean="blackColorPattern"/>
                 <ref bean="strobeColorPattern"/>
+                <ref bean="beatDetectorAudioInputColorPattern"/>
             </list>
         </property>
     </bean>

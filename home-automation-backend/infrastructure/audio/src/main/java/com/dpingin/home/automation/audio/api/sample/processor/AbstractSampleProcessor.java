@@ -1,5 +1,6 @@
 package com.dpingin.home.automation.audio.api.sample.processor;
 
+import com.dpingin.home.automation.audio.api.pattern.control.Controls;
 import com.dpingin.home.automation.audio.api.sample.processor.output.AbstractSampleProcessorOutput;
 import com.dpingin.home.automation.audio.api.sample.processor.SampleProcessor;
 
@@ -12,6 +13,14 @@ import com.dpingin.home.automation.audio.api.sample.processor.SampleProcessor;
  */
 public class AbstractSampleProcessor<T extends AbstractSampleProcessorOutput> implements SampleProcessor
 {
+    protected Controls controls;
+
+    @Override
+    public void setControls(Controls controls)
+    {
+        this.controls = controls;
+    }
+
     @Override
     public T processSamples(float[] samples, float sampleRate)
     {

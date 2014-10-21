@@ -1,5 +1,7 @@
 package com.dpingin.home.automation.audio.api.sample.processor;
 
+import com.dpingin.home.automation.audio.api.pattern.control.Controls;
+
 /**
  * Created with IntelliJ IDEA.
  * User: DanoSaur
@@ -9,5 +11,6 @@ package com.dpingin.home.automation.audio.api.sample.processor;
  */
 public interface SampleProcessor<T extends SampleProcessorOutput>
 {
+    void setControls(Controls controls);
     T processSamples(float[] samples, float sampleRate);
 }

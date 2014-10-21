@@ -1,6 +1,6 @@
 package com.dpingin.home.automation.audio.api.capture.test;
 
-import com.dpingin.home.automation.audio.impl.pattern.MinimAudioInputColorPattern;
+import com.dpingin.home.automation.audio.impl.pattern.AudioInputColorPattern;
 import com.dpingin.home.automation.audio.impl.pattern.StaticColorPattern;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class StreamingInputTest
     protected long runTimeSeconds = 60 * 60 * 60;
 
     @Autowired
-    protected MinimAudioInputColorPattern minimAudioInputColorPattern;
+    protected AudioInputColorPattern audioInputColorPattern;
 
     @Autowired
     protected StaticColorPattern staticColorPattern;
@@ -36,8 +36,8 @@ public class StreamingInputTest
     @Test
     public void sampleProcessorTest() throws RgbControllerException, InterruptedException
     {
-        minimAudioInputColorPattern.init();
-        minimAudioInputColorPattern.start();
+        audioInputColorPattern.init();
+        audioInputColorPattern.start();
 
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
@@ -49,7 +49,7 @@ public class StreamingInputTest
 
         staticColorPattern.start();
 
-        minimAudioInputColorPattern.stop();
-        minimAudioInputColorPattern.destroy();
+        audioInputColorPattern.stop();
+        audioInputColorPattern.destroy();
     }
 }

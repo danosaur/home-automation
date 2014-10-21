@@ -1,16 +1,23 @@
 package com.dpingin.home.automation.rgb.app.impl.controller;
 
+import com.dpingin.home.automation.audio.api.pattern.Pattern;
+import com.dpingin.home.automation.audio.api.pattern.control.AbstractControl;
+import com.dpingin.home.automation.audio.api.pattern.control.Control;
+import com.dpingin.home.automation.audio.api.pattern.control.Controls;
 import com.dpingin.home.automation.audio.api.pattern.switcher.PattenSwitcherException;
 import com.dpingin.home.automation.audio.api.pattern.switcher.PatternSwitcher;
 import com.dpingin.home.automation.audio.impl.pattern.StaticColorPattern;
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
-import com.dpingin.home.automation.rgb.controller.api.rgb.RgbController;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,13 +33,45 @@ public class RestController
     @Resource
     protected StaticColorPattern staticColorPattern;
     @Resource
-    PatternSwitcher patternSwitcher;
+    protected PatternSwitcher patternSwitcher;
+    @Resource
+    protected String defaultPatternName;
+
+    @PostConstruct
+    public void init()
+    {
+        try
+        {
+            if (defaultPatternName != null)
+                patternSwitcher.switchPattern(defaultPatternName);
+        } catch (PattenSwitcherException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
     @RequestMapping(value = "/pattern")
     @ResponseStatus(HttpStatus.OK)
     public void switchPattern(@RequestParam(value = "p", required = true) String patternName) throws PattenSwitcherException
     {
         patternSwitcher.switchPattern(patternName);
+    }
+
+    @RequestMapping(value = "/pattern/{name}/controls", method = RequestMethod.GET)
+    public @ResponseBody Controls getControls(@PathVariable(value = "name") String name) throws PattenSwitcherException
+    {
+        Pattern pattern = patternSwitcher.getPattern(name);
+        if (pattern == null)
+            throw new PattenSwitcherException(String.format("Pattern not found: %s", name));
+        return pattern.getControls();
+    }
+
+    @RequestMapping(value = "/pattern/{name}/controls", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateControls(@PathVariable(value = "name") String name, @RequestBody List<Control> controls) throws PattenSwitcherException
+    {
+        Pattern pattern = patternSwitcher.getPattern(name);
+        pattern.updateControls(controls);
     }
 
     @RequestMapping(value = "/rgb", method = RequestMethod.POST)

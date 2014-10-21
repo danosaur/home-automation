@@ -17,6 +17,14 @@ public abstract class SampleProcessorAwarePattern<T extends SampleProcessor> ext
 
     protected T sampleProcessor;
 
+    @Override
+    public void init()
+    {
+        super.init();
+        if (sampleProcessor != null)
+            sampleProcessor.setControls(controls);
+    }
+
     public void setSampleProcessor(T sampleProcessor)
     {
         this.sampleProcessor = sampleProcessor;

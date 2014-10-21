@@ -18,4 +18,6 @@ public interface PatternSwitcher
     void setPatterns(Collection<Pattern> patterns);
 
     void switchPattern(String name) throws PattenSwitcherException;
+
+    Pattern getPattern(String name);
 }

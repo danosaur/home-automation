@@ -1,5 +1,10 @@
 package com.dpingin.home.automation.audio.api.pattern;
 
+import com.dpingin.home.automation.audio.api.pattern.control.Control;
+import com.dpingin.home.automation.audio.api.pattern.control.Controls;
+
+import java.util.Collection;
+
 /**
  * Created with IntelliJ IDEA.
  * User: DanoSaur
@@ -16,4 +21,10 @@ public interface Pattern
     void stop();
 
     String getName();
+
+    Controls getControls();
+    void setControls(Controls controls);
+
+    void updateControls(Controls controls);
+    void updateControls(Collection<? extends Control> controls);
 }

@@ -54,4 +54,10 @@ public class PatternSwitcherImpl implements PatternSwitcher
 
         currentPattern = pattern;
     }
+
+    @Override
+    public Pattern getPattern(String name)
+    {
+        return patternMap.get(name);
+    }
 }

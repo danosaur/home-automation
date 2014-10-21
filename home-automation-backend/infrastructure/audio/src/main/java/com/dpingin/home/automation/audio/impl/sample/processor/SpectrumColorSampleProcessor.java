@@ -2,6 +2,7 @@ package com.dpingin.home.automation.audio.impl.sample.processor;
 
 import com.dpingin.home.automation.audio.api.sample.processor.AbstractSampleProcessor;
 import com.dpingin.home.automation.audio.api.sample.processor.SampleProcessor;
+import com.dpingin.home.automation.audio.impl.pattern.control.FloatControl;
 import com.dpingin.home.automation.audio.impl.sample.processor.output.ColorSampleProcessorOutput;
 import com.dpingin.home.automation.audio.impl.window.function.WindowFunction;
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
@@ -34,12 +35,12 @@ public class SpectrumColorSampleProcessor extends AbstractSampleProcessor<ColorS
     protected float lowsGain = 0.012f;
     protected float midsGain = 0.5f;
     protected float highsGain = 2.5f;
-    protected float lowsFrequencyFrom = 0f;
-    protected float lowsFrequencyTo = 200f;
-    protected float midsFrequencyFrom = 500f;
-    protected float midsFrequencyTo = 8000f;
-    protected float highsFrequencyFrom = 10000f;
-    protected float highsFrequencyTo = 20000f;
+    protected float lowsFrequencyFrom = 16.35f;
+    protected float lowsFrequencyTo = 32.70f;
+    protected float midsFrequencyFrom = 32.70f;
+    protected float midsFrequencyTo = 65.41f;
+    protected float highsFrequencyFrom = 65.41f;
+    protected float highsFrequencyTo = 130.81f;
     protected int windowSize = 1;
     protected boolean useHalfWindow = true;
     float maxLows = 0f;
@@ -47,12 +48,10 @@ public class SpectrumColorSampleProcessor extends AbstractSampleProcessor<ColorS
     float maxHighs = 0f;
     List<Color> prevColors = new LinkedList<>();
     double[] window;
+    protected String gainControlName = "gain";
 
     public void init()
     {
-        window = new WindowFunction()
-                .windowType(WindowFunction.BLACKMAN)
-                .generate(useHalfWindow ? windowSize * 2 : windowSize);
     }
 
     @Override
@@ -70,6 +69,7 @@ public class SpectrumColorSampleProcessor extends AbstractSampleProcessor<ColorS
         log.trace("Samples: {}", samples);
 
         //Apply gain scale
+        Float gain = controls.get(FloatControl.class, gainControlName).getValue();
         for (int i = 0; i < samples.length; i++)
             samples[i] = samples[i] * gain;
 

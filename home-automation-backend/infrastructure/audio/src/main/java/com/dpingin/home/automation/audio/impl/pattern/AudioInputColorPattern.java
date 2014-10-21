@@ -1,5 +1,6 @@
 package com.dpingin.home.automation.audio.impl.pattern;
 
+import com.dpingin.home.automation.audio.api.minim.audio.input.AudioInputProvider;
 import com.dpingin.home.automation.audio.api.pattern.Pattern;
 import com.dpingin.home.automation.audio.api.pattern.SampleProcessorAwarePattern;
 import com.dpingin.home.automation.audio.api.sample.buffer.SampleBuffer;
@@ -24,25 +25,34 @@ import org.springframework.util.Assert;
 public class AudioInputColorPattern extends SampleProcessorAwarePattern<SampleProcessor<ColorSampleProcessorOutput>> implements Pattern
 {
     private final static Logger log = LoggerFactory.getLogger(AudioInputColorPattern.class);
-
+    protected AudioInputProvider audioInputProvider;
     protected AudioInput audioInput;
     protected SampleBuffer sampleBuffer;
     protected RgbController rgbController;
+    protected AudioListener audioListener;
 
     @Override
     public void init()
     {
-        Assert.notNull(audioInput);
+        super.init();
+
+        Assert.notNull(audioInputProvider);
         Assert.notNull(sampleBuffer);
         Assert.notNull(rgbController);
 
+        audioInput = audioInputProvider.getAudioInput();
+    }
+
+    @Override
+    public void start()
+    {
         float audioInputBufferSize = audioInput.bufferSize();
         log.debug("Audio input buffer size {}", audioInputBufferSize);
 
         float sampleRate = audioInput.sampleRate();
         log.debug("Audio input sample rate {}", sampleRate);
 
-        audioInput.addListener(new AudioListener()
+        audioListener = new AudioListener()
         {
             @Override
             public void samples(float[] samples)
@@ -54,13 +64,19 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
             public void samples(float[] sampL, float[] sampR)
             {
             }
-        });
+        };
+        audioInput.addListener(audioListener);
+
+        super.start();
     }
 
     @Override
     public void stop()
     {
         super.stop();
+
+        audioInput.removeListener(audioListener);
+
         try
         {
             rgbController.setColor(Color.BLACK);
@@ -129,5 +145,14 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
         return this;
     }
 
+    public void setAudioInputProvider(AudioInputProvider audioInputProvider)
+    {
+        this.audioInputProvider = audioInputProvider;
+    }
 
+    public AudioInputColorPattern audioInputProvider(final AudioInputProvider audioInputProvider)
+    {
+        this.audioInputProvider = audioInputProvider;
+        return this;
+    }
 }

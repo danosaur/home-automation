@@ -1,8 +1,12 @@
 package com.dpingin.home.automation.audio.api.pattern;
 
+import com.dpingin.home.automation.audio.api.pattern.control.Control;
+import com.dpingin.home.automation.audio.api.pattern.control.Controls;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,6 +24,7 @@ public abstract class AbstractPattern implements Pattern
     protected String name;
 
     protected RgbController rgbController;
+    protected Controls controls;
 
     @Override
     public void init()
@@ -79,6 +84,40 @@ public abstract class AbstractPattern implements Pattern
     public String getName()
     {
         return name;
+    }
+
+    @Override
+    public Controls getControls()
+    {
+        return controls;
+    }
+
+    @Override
+    public void setControls(Controls controls)
+    {
+        this.controls = controls;
+    }
+
+    @Override
+    public void updateControls(Controls controls)
+    {
+        for (Control control : controls.values())
+        {
+            Control thisControl = this.controls.get(control.getName());
+            if (thisControl != null)
+                thisControl.setValue(control.getValue());
+        }
+    }
+
+    @Override
+    public void updateControls(Collection<? extends Control> controls)
+    {
+        for (Control control : controls)
+        {
+            Control thisControl = this.controls.get(control.getName());
+            if (thisControl != null)
+                thisControl.setValue(control.getValue());
+        }
     }
 
     public void setName(String name)
