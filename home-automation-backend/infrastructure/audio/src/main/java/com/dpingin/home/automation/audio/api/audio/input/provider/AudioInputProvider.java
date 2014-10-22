@@ -1,6 +1,6 @@
-package com.dpingin.home.automation.audio.api.minim.audio.input;
+package com.dpingin.home.automation.audio.api.audio.input.provider;
 
-import ddf.minim.AudioInput;
+import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
 
 /**
  * Created with IntelliJ IDEA.

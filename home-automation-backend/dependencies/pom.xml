@@ -13,5 +13,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>minim</module>
+        <module>jasiohost</module>
     </modules>
 </project>

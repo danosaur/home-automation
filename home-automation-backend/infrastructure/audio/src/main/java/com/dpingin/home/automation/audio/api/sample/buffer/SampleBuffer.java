@@ -14,4 +14,5 @@ public interface SampleBuffer
     float[] getSamples();
 
     void reset();
+
 }

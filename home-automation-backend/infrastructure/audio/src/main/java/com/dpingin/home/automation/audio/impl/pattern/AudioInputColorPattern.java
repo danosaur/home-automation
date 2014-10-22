@@ -1,6 +1,6 @@
 package com.dpingin.home.automation.audio.impl.pattern;
 
-import com.dpingin.home.automation.audio.api.minim.audio.input.AudioInputProvider;
+import com.dpingin.home.automation.audio.api.audio.input.provider.AudioInputProvider;
 import com.dpingin.home.automation.audio.api.pattern.Pattern;
 import com.dpingin.home.automation.audio.api.pattern.SampleProcessorAwarePattern;
 import com.dpingin.home.automation.audio.api.sample.buffer.SampleBuffer;
@@ -9,7 +9,7 @@ import com.dpingin.home.automation.audio.impl.sample.processor.output.ColorSampl
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbController;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
-import ddf.minim.AudioInput;
+import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
 import ddf.minim.AudioListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +46,10 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     @Override
     public void start()
     {
-        float audioInputBufferSize = audioInput.bufferSize();
+        float audioInputBufferSize = audioInput.getBufferSize();
         log.debug("Audio input buffer size {}", audioInputBufferSize);
 
-        float sampleRate = audioInput.sampleRate();
+        float sampleRate = audioInput.getSampleRate();
         log.debug("Audio input sample rate {}", sampleRate);
 
         audioListener = new AudioListener()
@@ -95,7 +95,7 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     @Override
     protected void generatePattern()
     {
-        ColorSampleProcessorOutput colorSampleProcessorOutput = sampleProcessor.processSamples(sampleBuffer.getSamples(), audioInput.sampleRate());
+        ColorSampleProcessorOutput colorSampleProcessorOutput = sampleProcessor.processSamples(sampleBuffer.getSamples(), audioInput.getSampleRate());
 
         try
         {

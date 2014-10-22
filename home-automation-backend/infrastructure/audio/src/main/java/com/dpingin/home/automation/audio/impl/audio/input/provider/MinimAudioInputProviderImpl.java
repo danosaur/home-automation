@@ -1,7 +1,8 @@
-package com.dpingin.home.automation.audio.impl.minim.audio.input;
+package com.dpingin.home.automation.audio.impl.audio.input.provider;
 
-import com.dpingin.home.automation.audio.api.minim.audio.input.AudioInputProvider;
-import ddf.minim.AudioInput;
+import com.dpingin.home.automation.audio.api.audio.input.provider.AbstractAudioInputProvider;
+import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
+import com.dpingin.home.automation.audio.impl.audio.input.MinimAudioInputImpl;
 import ddf.minim.Minim;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,27 +14,26 @@ import org.slf4j.LoggerFactory;
  * Time: 23:23
  * To change this template use File | Settings | File Templates.
  */
-public class AudioInputProviderImpl implements AudioInputProvider
+public class MinimAudioInputProviderImpl extends AbstractAudioInputProvider
 {
-    private final static Logger log = LoggerFactory.getLogger(AudioInputProviderImpl.class);
+    private final static Logger log = LoggerFactory.getLogger(MinimAudioInputProviderImpl.class);
 
     protected int audioInputBufferSize = 1024;
 
     protected Minim minim;
-    protected AudioInput audioInput;
 
     public void init()
     {
         if (minim == null)
             minim = new Minim(this);
 
-        audioInput = minim.getLineIn(Minim.MONO, audioInputBufferSize);
+        audioInput = new MinimAudioInputImpl(minim.getLineIn(Minim.MONO, audioInputBufferSize));
     }
 
     public void destroy()
     {
         if (audioInput != null)
-            audioInput.close();
+            audioInput.destroy();
 
         if (minim != null)
             minim.stop();
@@ -52,7 +52,7 @@ public class AudioInputProviderImpl implements AudioInputProvider
         this.audioInputBufferSize = audioInputBufferSize;
     }
 
-    public AudioInputProviderImpl audioInputBufferSize(final int audioInputBufferSize)
+    public MinimAudioInputProviderImpl audioInputBufferSize(final int audioInputBufferSize)
     {
         this.audioInputBufferSize = audioInputBufferSize;
         return this;

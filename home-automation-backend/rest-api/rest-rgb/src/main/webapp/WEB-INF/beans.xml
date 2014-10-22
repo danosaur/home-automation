@@ -19,8 +19,13 @@
         <constructor-arg value="${minim.audio.input.color.pattern.name}"/>
     </bean>
 
-    <bean id="audioInputProvider" class="com.dpingin.home.automation.audio.impl.minim.audio.input.AudioInputProviderImpl" init-method="init" destroy-method="destroy">
-        <property name="audioInputBufferSize" value="#{${audio.input.buffer.size}}"/>
+    <!--<bean id="minimAudioInputProvider" class="com.dpingin.home.automation.audio.impl.audio.input.provider.MinimAudioInputProviderImpl" init-method="init" destroy-method="destroy">-->
+        <!--<property name="audioInputBufferSize" value="#{${minim.audio.input.buffer.size}}"/>-->
+    <!--</bean>-->
+
+    <bean id="asioAudioInputProvider" class="com.dpingin.home.automation.audio.impl.audio.input.provider.AsioAudioInputProviderImpl" init-method="init" destroy-method="destroy">
+        <property name="driverName" value="${asio.audio.input.driver.name}"/>
+        <property name="channelIndex" value="${asio.audio.input.channel.index}"/>
     </bean>
 
     <bean id="threeBandColorGeneratorSampleProcessor" class="com.dpingin.home.automation.audio.impl.sample.processor.SpectrumColorSampleProcessor" init-method="init">
@@ -32,7 +37,7 @@
     <bean id="minimAudioInputColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.AudioInputColorPattern" init-method="init" destroy-method="destroy">
         <property name="name" value="${minim.audio.input.color.pattern.name}"/>
         <property name="rgbController" ref="rgbController"/>
-        <property name="audioInputProvider" ref="audioInputProvider"/>
+        <property name="audioInputProvider" ref="asioAudioInputProvider"/>
         <property name="sampleProcessor" ref="threeBandColorGeneratorSampleProcessor"/>
         <property name="sampleBuffer">
             <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
@@ -58,7 +63,7 @@
     <bean id="beatDetectorAudioInputColorPattern" class="com.dpingin.home.automation.audio.impl.pattern.AudioInputColorPattern" init-method="init" destroy-method="destroy">
         <property name="name" value="${beat.color.pattern.name}"/>
         <property name="rgbController" ref="rgbController"/>
-        <property name="audioInputProvider" ref="audioInputProvider"/>
+        <property name="audioInputProvider" ref="asioAudioInputProvider"/>
         <property name="sampleProcessor" ref="beatDetectorSampleProcessor"/>
         <property name="sampleBuffer">
             <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">

@@ -66,6 +66,11 @@
                 <artifactId>jackson-core-asl</artifactId>
                 <version>1.9.13</version>
             </dependency>
+            <dependency>
+                <groupId>com.synthbot</groupId>
+                <artifactId>jasiohost</artifactId>
+                <version>0.1-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
