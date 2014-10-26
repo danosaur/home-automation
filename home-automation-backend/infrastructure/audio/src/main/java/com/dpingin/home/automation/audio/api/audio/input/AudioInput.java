@@ -19,4 +19,7 @@ public interface AudioInput
 
     void init();
     void destroy();
+
+    void start() throws AudioInputException;
+    void stop();
 }

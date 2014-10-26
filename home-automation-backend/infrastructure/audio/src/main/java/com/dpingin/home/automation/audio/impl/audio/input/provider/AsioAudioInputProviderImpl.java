@@ -72,19 +72,6 @@ public class AsioAudioInputProviderImpl extends AbstractAudioInputProvider
         log.info(String.format("Selected audio driver: %s", driverName));
 
         asioDriver = AsioDriver.getDriver(driverName);
-
-        audioInput = new AsioAudioInputImpl().asioDriver(asioDriver);
-        audioInput.init();
-
-        Set<AsioChannel> activeChannels = new HashSet<AsioChannel>();
-        AsioChannel asioChannel = asioDriver.getChannelInput(channelIndex);
-        activeChannels.add(asioChannel);
-
-        log.info(String.format("Selected audio channel: %s", asioChannel.getChannelName()));
-
-        asioDriver.createBuffers(activeChannels);
-
-        asioDriver.start();
     }
 
     @Override
@@ -97,6 +84,8 @@ public class AsioAudioInputProviderImpl extends AbstractAudioInputProvider
     @Override
     public AudioInput getAudioInput()
     {
+        audioInput = new AsioAudioInputImpl().asioDriver(asioDriver).channelIndex(channelIndex);
+        audioInput.init();
         return audioInput;
     }
 

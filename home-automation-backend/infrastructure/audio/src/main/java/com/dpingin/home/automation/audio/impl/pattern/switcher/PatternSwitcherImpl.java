@@ -1,6 +1,7 @@
 package com.dpingin.home.automation.audio.impl.pattern.switcher;
 
 import com.dpingin.home.automation.audio.api.pattern.Pattern;
+import com.dpingin.home.automation.audio.api.pattern.PatternException;
 import com.dpingin.home.automation.audio.api.pattern.switcher.PattenSwitcherException;
 import com.dpingin.home.automation.audio.api.pattern.switcher.PatternSwitcher;
 import org.springframework.util.Assert;
@@ -50,7 +51,13 @@ public class PatternSwitcherImpl implements PatternSwitcher
         if (currentPattern != null)
             currentPattern.stop();
 
-        pattern.start();
+        try
+        {
+            pattern.start();
+        } catch (PatternException e)
+        {
+            throw new PattenSwitcherException("Failed to start pattern: " + name, e);
+        }
 
         currentPattern = pattern;
     }

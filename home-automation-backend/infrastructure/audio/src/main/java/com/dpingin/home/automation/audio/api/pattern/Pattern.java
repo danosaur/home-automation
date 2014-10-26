@@ -17,7 +17,7 @@ public interface Pattern
     void init();
     void destroy();
 
-    void start();
+    void start() throws PatternException;
     void stop();
 
     String getName();

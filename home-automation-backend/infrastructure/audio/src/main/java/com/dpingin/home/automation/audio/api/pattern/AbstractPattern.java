@@ -42,7 +42,7 @@ public abstract class AbstractPattern implements Pattern
     }
 
     @Override
-    public void start()
+    public void start() throws PatternException
     {
         thread = new Thread(new Runnable()
         {

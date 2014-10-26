@@ -3,6 +3,7 @@ package com.dpingin.home.automation.audio.impl.pattern;
 import com.dpingin.home.automation.audio.api.pattern.AbstractPattern;
 import com.dpingin.home.automation.audio.api.pattern.Controllable;
 import com.dpingin.home.automation.audio.api.pattern.Pattern;
+import com.dpingin.home.automation.audio.api.pattern.PatternException;
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
 import org.slf4j.Logger;
@@ -40,9 +41,9 @@ public class StrobeColorPattern extends AbstractPattern implements Pattern
     }
 
     @Override
-    public void start()
+    public void start() throws PatternException
     {
-        super.start();    //To change body of overridden methods use File | Settings | File Templates.
+        super.start();
 
         action = new Action();
         scheduledFuture = scheduledExecutorService.schedule(action, 0, TimeUnit.MILLISECONDS);

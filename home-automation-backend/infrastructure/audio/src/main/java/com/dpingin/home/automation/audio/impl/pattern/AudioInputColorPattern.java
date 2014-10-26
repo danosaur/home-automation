@@ -1,7 +1,9 @@
 package com.dpingin.home.automation.audio.impl.pattern;
 
+import com.dpingin.home.automation.audio.api.audio.input.AudioInputException;
 import com.dpingin.home.automation.audio.api.audio.input.provider.AudioInputProvider;
 import com.dpingin.home.automation.audio.api.pattern.Pattern;
+import com.dpingin.home.automation.audio.api.pattern.PatternException;
 import com.dpingin.home.automation.audio.api.pattern.SampleProcessorAwarePattern;
 import com.dpingin.home.automation.audio.api.sample.buffer.SampleBuffer;
 import com.dpingin.home.automation.audio.api.sample.processor.SampleProcessor;
@@ -44,7 +46,7 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     }
 
     @Override
-    public void start()
+    public void start() throws PatternException
     {
         float audioInputBufferSize = audioInput.getBufferSize();
         log.debug("Audio input buffer size {}", audioInputBufferSize);
@@ -67,6 +69,14 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
         };
         audioInput.addListener(audioListener);
 
+        try
+        {
+            audioInput.start();
+        } catch (AudioInputException e)
+        {
+            throw new PatternException("Failed to start audio input", e);
+        }
+
         super.start();
     }
 
@@ -75,6 +85,7 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     {
         super.stop();
 
+        audioInput.stop();
         audioInput.removeListener(audioListener);
 
         try

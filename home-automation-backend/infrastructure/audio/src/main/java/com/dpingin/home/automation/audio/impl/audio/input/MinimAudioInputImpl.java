@@ -1,6 +1,7 @@
 package com.dpingin.home.automation.audio.impl.audio.input;
 
 import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
+import com.dpingin.home.automation.audio.api.audio.input.AudioInputException;
 import ddf.minim.AudioListener;
 
 /**
@@ -56,6 +57,18 @@ public class MinimAudioInputImpl implements AudioInput
     public void destroy()
     {
         this.audioInput.close();
+    }
+
+    @Override
+    public void start() throws AudioInputException
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void stop()
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void setAudioInput(ddf.minim.AudioInput audioInput)

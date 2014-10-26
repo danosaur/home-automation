@@ -46,8 +46,7 @@ public class SpectrumColorSampleProcessor extends AbstractSampleProcessor<ColorS
     float maxLows = 0f;
     float maxMids = 0f;
     float maxHighs = 0f;
-    List<Color> prevColors = new LinkedList<>();
-    double[] window;
+
     protected String gainControlName = "gain";
 
     public void init()

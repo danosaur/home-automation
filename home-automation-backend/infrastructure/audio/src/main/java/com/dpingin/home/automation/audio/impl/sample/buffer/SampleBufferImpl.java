@@ -4,6 +4,7 @@ import com.dpingin.home.automation.audio.api.sample.buffer.SampleBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+import uk.co.boundedbuffer.ConcurrentBlockingFloatQueue;
 
 import java.util.Arrays;
 
@@ -19,6 +20,8 @@ public class SampleBufferImpl implements SampleBuffer
     private static Logger log = LoggerFactory.getLogger(SampleBufferImpl.class);
     protected int size;
     protected float[] buffer;
+
+    protected Object lock = new Object();
 
     protected int fillCounter = 0;
 
@@ -38,19 +41,17 @@ public class SampleBufferImpl implements SampleBuffer
 
         float[] tempBuffer = new float[size];
 
-        for (int i = 0; i < size; i++)
-        {
-            if (i < memorySize)
-                tempBuffer[i] = buffer[i + sampleCount];
-            else
-                tempBuffer[i] = samples[i - memorySize];
-        }
+        System.arraycopy(buffer, sampleCount, tempBuffer, 0, memorySize);
+        System.arraycopy(samples, 0, tempBuffer, memorySize, sampleCount);
 
         fillCounter += sampleCount;
-        if (fillCounter > size)
+        if (fillCounter >= size)
         {
             fillCounter = size;
-            buffer = tempBuffer;
+            synchronized (lock)
+            {
+                buffer = tempBuffer;
+            }
         }
     }
 
@@ -65,7 +66,10 @@ public class SampleBufferImpl implements SampleBuffer
             {
             }
 
-        return Arrays.copyOf(buffer, buffer.length);
+        synchronized (lock)
+        {
+            return Arrays.copyOf(buffer, buffer.length);
+        }
     }
 
     @Override
