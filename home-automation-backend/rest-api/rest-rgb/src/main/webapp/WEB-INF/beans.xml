@@ -40,12 +40,12 @@
         <property name="audioInputProvider" ref="asioAudioInputProvider"/>
         <property name="sampleProcessor" ref="threeBandColorGeneratorSampleProcessor"/>
         <property name="sampleBuffer">
-            <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
+            <bean class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
                 <property name="size" value="#{${minim.audio.input.color.pattern.buffer.size}}"/>
             </bean>
         </property>
         <property name="controls">
-            <bean id="controls" class="com.dpingin.home.automation.audio.impl.pattern.control.TreeMapControlsImpl">
+            <bean class="com.dpingin.home.automation.audio.impl.pattern.control.TreeMapControlsImpl">
                 <constructor-arg name="collection">
                     <list>
                         <bean id="gainControl" class="com.dpingin.home.automation.audio.impl.pattern.control.FloatControl" init-method="init" destroy-method="destroy">
@@ -66,7 +66,7 @@
         <property name="audioInputProvider" ref="asioAudioInputProvider"/>
         <property name="sampleProcessor" ref="beatDetectorSampleProcessor"/>
         <property name="sampleBuffer">
-            <bean id="sampleBuffer" class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
+            <bean class="com.dpingin.home.automation.audio.impl.sample.buffer.SampleBufferImpl">
                 <property name="size" value="#{${beat.color.pattern.buffer.size}}"/>
             </bean>
         </property>

@@ -1,6 +1,6 @@
 package com.dpingin.home.automation.audio.api.pattern.control;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * Created with IntelliJ IDEA.

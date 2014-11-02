@@ -17,10 +17,10 @@
 	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
 		<property name="messageConverters">
 			<list>
-				<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+				<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
 					<property name="supportedMediaTypes" value="application/json"/>
 					<property name="objectMapper">
-						<bean class="org.codehaus.jackson.map.ObjectMapper"/>
+						<bean class="com.fasterxml.jackson.databind.ObjectMapper"/>
 					</property>
 				</bean>
 				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
@@ -29,7 +29,7 @@
 	</bean>
 
 	<!-- The Jackson view that uses the Jackson object mapper for serialization. -->
-	<bean id="restJsonMarshalView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+	<bean id="restJsonMarshalView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
 		<property name="modelKeys">
 			<set>
 				<value>response</value>
