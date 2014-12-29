@@ -1,5 +1,6 @@
 package com.dpingin.home.automation.audio.impl.pattern;
 
+import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
 import com.dpingin.home.automation.audio.api.audio.input.AudioInputException;
 import com.dpingin.home.automation.audio.api.audio.input.provider.AudioInputProvider;
 import com.dpingin.home.automation.audio.api.pattern.Pattern;
@@ -11,7 +12,6 @@ import com.dpingin.home.automation.audio.impl.sample.processor.output.ColorSampl
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbController;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
-import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
 import ddf.minim.AudioListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,35 +46,48 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     }
 
     @Override
+    public void destroy()
+    {
+        stop();
+
+        if (audioInput != null)
+        {
+            audioInput.destroy();
+            audioInput = null;
+        }
+        super.destroy();
+    }
+
+    @Override
     public void start() throws PatternException
     {
-        float audioInputBufferSize = audioInput.getBufferSize();
-        log.debug("Audio input buffer size {}", audioInputBufferSize);
-
-        float sampleRate = audioInput.getSampleRate();
-        log.debug("Audio input sample rate {}", sampleRate);
-
-        audioListener = new AudioListener()
-        {
-            @Override
-            public void samples(float[] samples)
-            {
-                sampleBuffer.addSamples(samples);
-            }
-
-            @Override
-            public void samples(float[] sampL, float[] sampR)
-            {
-            }
-        };
-        audioInput.addListener(audioListener);
-
         try
         {
+            float audioInputBufferSize = audioInput.getBufferSize();
+            log.debug("Audio input buffer size {}", audioInputBufferSize);
+
+            float sampleRate = audioInput.getSampleRate();
+            log.debug("Audio input sample rate {}", sampleRate);
+
+            audioListener = new AudioListener()
+            {
+                @Override
+                public void samples(float[] samples)
+                {
+                    sampleBuffer.addSamples(samples);
+                }
+
+                @Override
+                public void samples(float[] sampL, float[] sampR)
+                {
+                }
+            };
+            audioInput.addListener(audioListener);
+
             audioInput.start();
         } catch (AudioInputException e)
         {
-            throw new PatternException("Failed to start audio input", e);
+            throw new PatternException("Failed to start pattern", e);
         }
 
         super.start();
@@ -85,8 +98,14 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     {
         super.stop();
 
-        audioInput.stop();
-        audioInput.removeListener(audioListener);
+        if (audioInput != null)
+        {
+            audioInput.stop();
+            audioInput.removeListener(audioListener);
+        }
+
+        if (sampleBuffer != null)
+            sampleBuffer.reset();
 
         try
         {
@@ -98,22 +117,35 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     }
 
     @Override
-    public void destroy()
-    {
-        super.destroy();
-    }
-
-    @Override
     protected void generatePattern()
     {
-        ColorSampleProcessorOutput colorSampleProcessorOutput = sampleProcessor.processSamples(sampleBuffer.getSamples(), audioInput.getSampleRate());
-
         try
         {
-            rgbController.setColor(colorSampleProcessorOutput.getValue());
+            float[] samples = sampleBuffer.getSamples();
+            if (samples == null)
+            {
+                rgbController.setColor(Color.BLACK);
+                try
+                {
+                    Thread.sleep(50);
+                } catch (InterruptedException e)
+                {
+                }
+            }
+            else
+            {
+                float sampleRate = audioInput.getSampleRate();
+
+                ColorSampleProcessorOutput colorSampleProcessorOutput = sampleProcessor.processSamples(samples, sampleRate);
+
+                rgbController.setColor(colorSampleProcessorOutput.getValue());
+            }
         } catch (RgbControllerException e)
         {
             log.error("Failed to set color", e);
+        } catch (AudioInputException e)
+        {
+            log.error("Failed to process samples", e);
         }
     }
 

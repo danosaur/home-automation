@@ -58,13 +58,8 @@ public class SampleBufferImpl implements SampleBuffer
     @Override
     public float[] getSamples()
     {
-        while (buffer == null)
-            try
-            {
-                Thread.sleep(20);
-            } catch (InterruptedException e)
-            {
-            }
+        if (buffer == null)
+            return null;
 
         synchronized (lock)
         {

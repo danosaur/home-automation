@@ -50,9 +50,13 @@ public class StaticColorPattern extends AbstractPattern implements Pattern
         {
             if (!color.equals(rgbController.getColor()))
                 rgbController.setColor(color);
+            else
+                Thread.sleep(10);
         } catch (RgbControllerException e)
         {
             log.error("Failed to set color", e);
+        } catch (InterruptedException e)
+        {
         }
     }
 

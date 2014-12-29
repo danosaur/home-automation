@@ -26,6 +26,8 @@ public abstract class AbstractPattern implements Pattern
     protected RgbController rgbController;
     protected Controls controls;
 
+    private Object lock = new Object();
+
     @Override
     public void init()
     {
@@ -44,39 +46,48 @@ public abstract class AbstractPattern implements Pattern
     @Override
     public void start() throws PatternException
     {
-        thread = new Thread(new Runnable()
+        synchronized (lock)
         {
-            @Override
-            public void run()
+            running = true;
+            thread = new Thread(new Runnable()
             {
-                running = true;
-                while (running)
+                @Override
+                public void run()
                 {
-                    long startTime = System.nanoTime();
+                    while (running)
+                    {
+                        long startTime = System.nanoTime();
 
-                    generatePattern();
+                        generatePattern();
 
-                    long endTime = System.nanoTime();
-                    long duration = endTime - startTime;
+                        long endTime = System.nanoTime();
+                        long duration = endTime - startTime;
 
-                    log.debug("Pattern render duration: {} ms", duration / 1024 / 1024);
+                        log.debug("Pattern render duration: {} ms", duration / 1024 / 1024);
+                    }
                 }
-            }
-        });
-        thread.start();
+            });
+            thread.start();
+        }
     }
 
     @Override
     public void stop()
     {
-        running = false;
-        thread.interrupt();
-        try
+        synchronized (lock)
         {
-            thread.join();
-        } catch (InterruptedException e)
-        {
-            log.error("Interrupted", e);
+            if (!running)
+                return;
+
+            running = false;
+            thread.interrupt();
+            try
+            {
+                thread.join();
+            } catch (InterruptedException e)
+            {
+                log.error("Interrupted", e);
+            }
         }
     }
 

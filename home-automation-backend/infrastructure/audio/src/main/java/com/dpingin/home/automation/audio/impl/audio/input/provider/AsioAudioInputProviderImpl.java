@@ -77,8 +77,12 @@ public class AsioAudioInputProviderImpl extends AbstractAudioInputProvider
     @Override
     public void destroy()
     {
-        asioDriver.stop();
-        asioDriver.shutdownAndUnloadDriver();
+        if (asioDriver != null)
+        {
+            asioDriver.stop();
+            asioDriver.shutdownAndUnloadDriver();
+            asioDriver = null;
+        }
     }
 
     @Override

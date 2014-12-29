@@ -2,7 +2,6 @@ package com.dpingin.home.automation.audio.impl.audio.input;
 
 import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
 import com.dpingin.home.automation.audio.api.audio.input.AudioInputException;
-import com.dpingin.home.automation.audio.api.audio.input.provider.AudioInputProviderException;
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
@@ -10,11 +9,8 @@ import com.synthbot.jasiohost.AsioDriverState;
 import ddf.minim.AudioListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,11 +29,20 @@ public class AsioAudioInputImpl implements AudioInput
     protected int channelIndex;
     protected AsioDriverListener asioDriverListener;
     protected Set<AudioListener> audioListeners = new HashSet<>();
+    private Object lock = new Object();
 
     @Override
-    public float getSampleRate()
+    public float getSampleRate() throws AudioInputException
     {
-        return (float) asioDriver.getSampleRate();
+        Assert.notNull(asioDriver, "ASIO driver can not be null");
+
+        synchronized (lock)
+        {
+            if (asioDriver.getCurrentState().ordinal() < AsioDriverState.INITIALIZED.ordinal())
+                throw new AudioInputException("ASIO driver is not initialized");
+
+            return (float) asioDriver.getSampleRate();
+        }
     }
 
     @Override
@@ -61,95 +66,123 @@ public class AsioAudioInputImpl implements AudioInput
     @Override
     public void init()
     {
-        asioDriverListener = new AsioDriverListener()
+        Assert.notNull(asioDriver, "ASIO driver can not be null");
+
+        synchronized (lock)
         {
-            @Override
-            public void bufferSwitch(long systemTime, long samplePosition, Set<AsioChannel> channels)
+            log.info("Initializing ASIO audio input");
+
+            asioDriverListener = new AsioDriverListener()
             {
-                log.trace("switch!");
-
-                AsioChannel[] audioChannels = channels.toArray(new AsioChannel[0]);
-
-                float[] samples = new float[audioChannels[0].getByteBuffer().limit() / 4];
-                audioChannels[0].read(samples);
-
-                for (AudioListener audioListener : audioListeners)
+                @Override
+                public void bufferSwitch(long systemTime, long samplePosition, Set<AsioChannel> channels)
                 {
-                    try
+                    log.trace("switch!");
+
+                    AsioChannel[] audioChannels = channels.toArray(new AsioChannel[0]);
+
+                    float[] samples = new float[audioChannels[0].getByteBuffer().limit() / 4];
+                    audioChannels[0].read(samples);
+
+                    for (AudioListener audioListener : audioListeners)
                     {
-                        audioListener.samples(samples);
-                    } catch (Throwable e)
-                    {
-                        log.warn("Audio listener exception", e);
+                        try
+                        {
+                            audioListener.samples(samples);
+                        } catch (Throwable e)
+                        {
+                            log.warn("Audio listener exception", e);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void sampleRateDidChange(double sampleRate)
-            {
-            }
+                @Override
+                public void sampleRateDidChange(double sampleRate)
+                {
+                }
 
-            @Override
-            public void resetRequest()
-            {
-            }
+                @Override
+                public void resetRequest()
+                {
+                }
 
-            @Override
-            public void resyncRequest()
-            {
-            }
+                @Override
+                public void resyncRequest()
+                {
+                }
 
-            @Override
-            public void bufferSizeChanged(int bufferSize)
-            {
-            }
+                @Override
+                public void bufferSizeChanged(int bufferSize)
+                {
+                }
 
-            @Override
-            public void latenciesChanged(int inputLatency, int outputLatency)
-            {
-            }
-        };
+                @Override
+                public void latenciesChanged(int inputLatency, int outputLatency)
+                {
+                }
+            };
 
-        asioDriver.addAsioDriverListener(asioDriverListener);
+            asioDriver.addAsioDriverListener(asioDriverListener);
+        }
     }
 
     @Override
     public void destroy()
     {
-        audioListeners.clear();
-
-        if (asioDriver != null && asioDriverListener != null)
+        synchronized (lock)
         {
-            asioDriver.removeAsioDriverListener(asioDriverListener);
-            asioDriverListener = null;
+            log.info("Destroying ASIO audio input");
+
+            stop();
+
+            audioListeners.clear();
+
+            if (asioDriver != null && asioDriverListener != null)
+            {
+                asioDriver.removeAsioDriverListener(asioDriverListener);
+                asioDriverListener = null;
+            }
         }
     }
 
     @Override
     public void start() throws AudioInputException
     {
-        if (asioDriver.getCurrentState() == AsioDriverState.RUNNING)
-            throw new AudioInputException("Audio channel is currently running");
+        Assert.notNull(asioDriver, "ASIO driver can not be null");
 
-        Set<AsioChannel> activeChannels = new HashSet<AsioChannel>();
-        AsioChannel asioChannel = asioDriver.getChannelInput(channelIndex);
-        activeChannels.add(asioChannel);
+        synchronized (lock)
+        {
+            log.info("Starting ASIO audio input");
 
-        log.info(String.format("Starting audio channel: %s", asioChannel.getChannelName()));
+            if (asioDriver.getCurrentState() == AsioDriverState.RUNNING)
+                throw new AudioInputException("Audio channel is currently running");
 
-        asioDriver.createBuffers(activeChannels);
+            Set<AsioChannel> activeChannels = new HashSet<AsioChannel>();
+            AsioChannel asioChannel = asioDriver.getChannelInput(channelIndex);
+            activeChannels.add(asioChannel);
 
-        asioDriver.start();
+            log.info(String.format("Starting audio channel: %s", asioChannel.getChannelName()));
+
+            asioDriver.createBuffers(activeChannels);
+
+            asioDriver.start();
+        }
     }
 
     @Override
     public void stop()
     {
-        if (asioDriver.getCurrentState() == AsioDriverState.RUNNING)
+        Assert.notNull(asioDriver, "ASIO driver can not be null");
+
+        synchronized (lock)
         {
-            asioDriver.stop();
-            asioDriver.disposeBuffers();
+            if (asioDriver.getCurrentState() == AsioDriverState.RUNNING)
+            {
+                log.info("Stopping ASIO audio input");
+
+                asioDriver.stop();
+                asioDriver.disposeBuffers();
+            }
         }
     }
 

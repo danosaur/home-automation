@@ -11,7 +11,7 @@ import ddf.minim.AudioListener;
  */
 public interface AudioInput
 {
-    float getSampleRate();
+    float getSampleRate() throws AudioInputException;
     int getBufferSize();
 
     void addListener(AudioListener audioListener);
