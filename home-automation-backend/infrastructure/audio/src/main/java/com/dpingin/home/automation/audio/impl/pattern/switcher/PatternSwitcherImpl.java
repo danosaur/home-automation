@@ -4,6 +4,8 @@ import com.dpingin.home.automation.audio.api.pattern.Pattern;
 import com.dpingin.home.automation.audio.api.pattern.PatternException;
 import com.dpingin.home.automation.audio.api.pattern.switcher.PattenSwitcherException;
 import com.dpingin.home.automation.audio.api.pattern.switcher.PatternSwitcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -19,9 +21,13 @@ import java.util.Map;
  */
 public class PatternSwitcherImpl implements PatternSwitcher
 {
+    private static final Logger log = LoggerFactory.getLogger(PatternSwitcherImpl.class);
+
     protected Map<String, Pattern> patternMap = new HashMap<>();
 
     protected Pattern currentPattern;
+
+    private Object lock = new Object();
 
     @Override
     public void addPattern(Pattern pattern)
@@ -29,7 +35,10 @@ public class PatternSwitcherImpl implements PatternSwitcher
         Assert.notNull(pattern);
         Assert.hasText(pattern.getName());
 
-        patternMap.put(pattern.getName(), pattern);
+        synchronized (lock)
+        {
+            patternMap.put(pattern.getName(), pattern);
+        }
     }
 
     @Override
@@ -44,22 +53,33 @@ public class PatternSwitcherImpl implements PatternSwitcher
     {
         Assert.hasText(name);
 
-        Pattern pattern = patternMap.get(name);
-        if (pattern == null)
-            throw new PattenSwitcherException("Pattern not found: " + name);
-
-        if (currentPattern != null)
-            currentPattern.stop();
-
-        try
+        synchronized (lock)
         {
-            pattern.start();
-        } catch (PatternException e)
-        {
-            throw new PattenSwitcherException("Failed to start pattern: " + name, e);
+            Pattern pattern = patternMap.get(name);
+            if (pattern == null)
+                throw new PattenSwitcherException("Pattern not found: " + name);
+
+            log.info(String.format("Switching pattern to: %s...", name));
+
+            if (currentPattern != null)
+            {
+                log.debug(String.format("Stopping current pattern: %s...", currentPattern.getName()));
+                currentPattern.stop();
+                log.debug("Current pattern stopped");
+            }
+
+            try
+            {
+                log.debug("Starting new pattern...");
+                pattern.start();
+                log.debug("New pattern started");
+            } catch (PatternException e)
+            {
+                throw new PattenSwitcherException("Failed to start pattern: " + name, e);
+            }
+
+            currentPattern = pattern;
         }
-
-        currentPattern = pattern;
     }
 
     @Override

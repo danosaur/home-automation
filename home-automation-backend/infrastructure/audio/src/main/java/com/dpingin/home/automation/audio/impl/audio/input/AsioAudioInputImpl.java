@@ -70,7 +70,7 @@ public class AsioAudioInputImpl implements AudioInput
 
         synchronized (lock)
         {
-            log.info("Initializing ASIO audio input");
+            log.info("Initializing ASIO audio input...");
 
             asioDriverListener = new AsioDriverListener()
             {
@@ -122,7 +122,11 @@ public class AsioAudioInputImpl implements AudioInput
                 }
             };
 
+            log.debug("Adding ASIO driver listener...");
+
             asioDriver.addAsioDriverListener(asioDriverListener);
+
+            log.info("Initialized ASIO audio input");
         }
     }
 
@@ -131,7 +135,7 @@ public class AsioAudioInputImpl implements AudioInput
     {
         synchronized (lock)
         {
-            log.info("Destroying ASIO audio input");
+            log.info("Destroying ASIO audio input...");
 
             stop();
 
@@ -139,9 +143,11 @@ public class AsioAudioInputImpl implements AudioInput
 
             if (asioDriver != null && asioDriverListener != null)
             {
+                log.debug("Removing ASIO driver listener...");
                 asioDriver.removeAsioDriverListener(asioDriverListener);
                 asioDriverListener = null;
             }
+            log.info("Destroyed ASIO audio input");
         }
     }
 
@@ -152,7 +158,7 @@ public class AsioAudioInputImpl implements AudioInput
 
         synchronized (lock)
         {
-            log.info("Starting ASIO audio input");
+            log.info("Starting ASIO audio input...");
 
             if (asioDriver.getCurrentState() == AsioDriverState.RUNNING)
                 throw new AudioInputException("Audio channel is currently running");
@@ -161,11 +167,15 @@ public class AsioAudioInputImpl implements AudioInput
             AsioChannel asioChannel = asioDriver.getChannelInput(channelIndex);
             activeChannels.add(asioChannel);
 
-            log.info(String.format("Starting audio channel: %s", asioChannel.getChannelName()));
+            log.info(String.format("Starting audio channel: %s...", asioChannel.getChannelName()));
 
             asioDriver.createBuffers(activeChannels);
 
+            log.debug(String.format("Started audio channel: %s", asioChannel.getChannelName()));
+
             asioDriver.start();
+
+            log.info("Started ASIO audio input");
         }
     }
 
@@ -178,10 +188,15 @@ public class AsioAudioInputImpl implements AudioInput
         {
             if (asioDriver.getCurrentState() == AsioDriverState.RUNNING)
             {
-                log.info("Stopping ASIO audio input");
+                log.info("Stopping ASIO audio input...");
 
                 asioDriver.stop();
+
+                log.debug("Disposing buffers...");
+
                 asioDriver.disposeBuffers();
+
+                log.info("Stopped ASIO audio input");
             }
         }
     }
