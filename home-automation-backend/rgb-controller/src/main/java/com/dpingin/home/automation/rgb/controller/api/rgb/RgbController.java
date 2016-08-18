@@ -11,6 +11,11 @@ import com.dpingin.home.automation.rgb.controller.api.color.Color;
  */
 public interface RgbController
 {
+	void init() throws RgbControllerException;
+	void destroy();
+
+	void setPortName(String portName);
+
     Color getColor();
     void setColor(Color color) throws RgbControllerException;
     void setColor(int r, int g, int b) throws RgbControllerException;

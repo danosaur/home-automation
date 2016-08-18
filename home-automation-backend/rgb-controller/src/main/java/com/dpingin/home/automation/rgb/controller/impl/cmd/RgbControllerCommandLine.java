@@ -6,6 +6,9 @@ import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException
 import com.dpingin.home.automation.rgb.controller.api.rgb.sequence.player.RgbSequencePlayer;
 import com.dpingin.home.automation.rgb.controller.api.rgb.sequence.player.RgbSequencePlayerException;
 import com.dpingin.home.automation.rgb.controller.util.HexUtils;
+import org.apache.commons.cli.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StringUtils;
@@ -24,216 +27,308 @@ import java.util.Random;
  */
 public class RgbControllerCommandLine
 {
-    protected static RgbController rgbController;
-    protected static RgbSequencePlayer rgbSequencePlayer;
+	private static final Logger log = LoggerFactory.getLogger(RgbControllerCommandLine.class);
 
-    public static void main(String[] args) throws RgbControllerException
-    {
-        ApplicationContext context = new ClassPathXmlApplicationContext("/applicationContext.xml");
-        rgbController = context.getBean(RgbController.class);
-        rgbSequencePlayer = context.getBean(RgbSequencePlayer.class);
+	protected static RgbController rgbController;
+	protected static RgbSequencePlayer rgbSequencePlayer;
 
-        if (args.length == 1)
-            parseInput(args[0]);
-        else if (args.length >= 3)
-            parseInput(args[0] + " " + args[1] + " " + args[2]);
+	public static void main(String[] args) throws RgbControllerException
+	{
+		ApplicationContext context = new ClassPathXmlApplicationContext("/applicationContext.xml");
+		rgbController = context.getBean(RgbController.class);
+		rgbSequencePlayer = context.getBean(RgbSequencePlayer.class);
 
-        System.out.println("Input format: RRR GGG BBB | 0xRR 0xGG | 0xBB | #rrggbb");
+		handleInput(args);
 
-        while (true)
-        {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            try
-            {
-                String input = bufferedReader.readLine();
+		while (true)
+		{
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+			try
+			{
+				String input = bufferedReader.readLine();
 
-                if (!parseInput(input))
-                    System.out.println("Input format: RRR GGG BBB | 0xRR 0xGG | 0xBB | #rrggbb");
+				handleInput(input.trim().split(" "));
+			}
+			catch (Exception e)
+			{
+				log.error("Unhandled error occurred", e);
+				break;
+			}
+		}
+	}
 
-            } catch (IOException e)
-            {
-                break;
-            }
-        }
-    }
+	private static boolean handleInput(String[] input) throws RgbControllerException
+	{
+		Option portOption = Option.builder("port")
+								  .hasArg()
+								  .desc("COM port name")
+								  .build();
 
-    private static boolean parseInput(String input) throws RgbControllerException
-    {
-        String[] split = input.split(" ");
-//        if (split.length == 1)
-//        {
-            if (split[0].startsWith("#") && split[0].length() == 7)
-            {
-                String[] colors = new String[]{input.substring(1, 3), input.substring(3, 5), input.substring(5, 7)};
+		Option rndOption = Option.builder("random")
+								 .desc("Random color")
+								 .build();
 
-                return setColor(colors, 16);
-            } else if ("rnd".equals(split[0]))
-            {
-                Random rnd = new Random(System.currentTimeMillis());
-                int r = rnd.nextInt(256);
-                int g = rnd.nextInt(256);
-                int b = rnd.nextInt(256);
+		Option colorOption = Option.builder("color")
+								   .hasArg()
+								   .desc("Selected color as #rrggbb")
+								   .build();
 
-                return setColor(r, g, b);
-            } else if ("flow".equals(split[0]))
-            {
-                float v = 1f;
-                if (split.length >= 2 && StringUtils.hasLength(split[1]))
-                    v = Float.parseFloat(split[1]);
-                float increment = 0.01f;
-                if (split.length >= 3 && StringUtils.hasLength(split[2]))
-                    increment = Float.parseFloat(split[2]);
-                int sleepMillis = 100;
-                if (split.length >= 4 && StringUtils.hasLength(split[3]))
-                    sleepMillis = Integer.parseInt(split[3]);
-                float s = 1f;
-                if (split.length >= 5 && StringUtils.hasLength(split[4]))
-                    s = Float.parseFloat(split[4]);
-                for (float h = 0; ; h += increment)
-                {
-                    setColor(Color.fromHSB(h, s, v));
-                    sleep(sleepMillis);
-                    try
-                    {
-                        if (System.in.available() > 0)
-                            return true;
-                    } catch (IOException e)
-                    {
-                    }
-                    if (h == 1)
-                        h = 0;
-                }
-            } else if ("flash".equals(split[0]))
-            {
-                for (int i = 0; i < 20; i++)
-                {
-                    Random rnd = new Random(System.currentTimeMillis());
+		Option colorsOption = Option.builder("colors")
+									.numberOfArgs(3)
+									.desc("Selected color as 0xRR 0xGG 0xBB or RRR GGG BBB")
+									.build();
 
-                    int r = rnd.nextInt(256);
-                    int g = rnd.nextInt(256);
-                    int b = rnd.nextInt(256);
+		Option flowOption = Option.builder("flow")
+								  .numberOfArgs(3)
+								  .optionalArg(true)
+								  .desc("Smooth flow of colors")
+								  .build();
 
-                    setColor(r, g, b);
+		Option flashOption = Option.builder("flash")
+								   .desc("Flash several times")
+								   .build();
 
-                    sleep(100);
+		Option strobeOption = Option.builder("strobe")
+									.desc("Strobe until stopped")
+									.build();
 
-                    setColor(0, 0, 0);
+		Option stopOption = Option.builder("stop")
+								  .desc("Stop strobe")
+								  .build();
 
-                    sleep(100);
-                }
-                return true;
-            } else if ("strobe".equals(split[0]))
-            {
-                try
-                {
-                    rgbSequencePlayer.play("strobe");
-                    return true;
-                } catch (RgbSequencePlayerException e)
-                {
-                    System.out.println("Failed to play sequence: " + e.getMessage());
-                }
-                return false;
-            } else if ("stop".equals(split[0]))
-            {
-                rgbSequencePlayer.stop();
-                return true;
-            } else if ("off".equals(split[0]))
-            {
-                rgbController.setColor(Color.BLACK);
-                return true;
-            } else if ("colors".equals(split[0]))
-            {
-                for (int i = 0; i < 20; i++)
-                {
-                    setColor(255, 0, 0);
+		Option offOption = Option.builder("off")
+								 .desc("Turn off")
+								 .build();
 
-                    sleep(200);
+		Options options = new Options();
+		options.addOption(portOption);
+		options.addOption(rndOption);
+		options.addOption(colorOption);
+		options.addOption(colorsOption);
+		options.addOption(flowOption);
+		options.addOption(flashOption);
+		options.addOption(strobeOption);
+		options.addOption(stopOption);
+		options.addOption(offOption);
 
-                    setColor(0, 0, 255);
+		try
+		{
+			CommandLineParser parser = new DefaultParser();
+			CommandLine commandLine = parser.parse(options, input);
 
-                    sleep(200);
 
-                    setColor(255, 128, 0);
+			if (commandLine.hasOption(portOption.getOpt()))
+			{
+				String port = commandLine.getOptionValue(portOption.getOpt());
 
-                    sleep(200);
+				rgbController.setPortName(port);
+				rgbController.init();
+			}
+			if (commandLine.hasOption(rndOption.getOpt()))
+			{
+				Random rnd = new Random(System.currentTimeMillis());
+				int r = rnd.nextInt(256);
+				int g = rnd.nextInt(256);
+				int b = rnd.nextInt(256);
 
-                    setColor(0, 255, 0);
+				return setColor(r, g, b);
+			}
+			else if (commandLine.hasOption(colorOption.getOpt()))
+			{
+				String color = commandLine.getOptionValue(colorOption.getOpt());
 
-                    sleep(200);
+				if (color.startsWith("#") && color.length() == 7)
+				{
+					String[] colors = new String[]{color.substring(1, 3), color.substring(3, 5), color.substring(5, 7)};
+					return setColor(colors, 16);
+				}
+				else
+				{
+					throw new ParseException("Color in format #rrggbb expected");
+				}
+			}
+			else if (commandLine.hasOption(colorsOption.getOpt()))
+			{
+				String[] colors = commandLine.getOptionValues(colorsOption.getOpt());
 
-                    setColor(0, 255, 255);
+				if (colors != null && colors.length == 3)
+				{
+					if (colors[0].startsWith("0x")
+							&& colors[1].startsWith("0x")
+							&& colors[2].startsWith("0x"))
+					{
+						colors[0] = colors[0].replace("0x", "");
+						colors[1] = colors[1].replace("0x", "");
+						colors[2] = colors[2].replace("0x", "");
 
-                    sleep(200);
+						return setColor(colors, 16);
+					}
+					else
+					{
+						return setColor(colors, 10);
+					}
+				}
+				else
+				{
+					throw new ParseException("Color in format 0xRR 0xGG 0xBB or RRR GGG BBB expected");
+				}
+			}
+			else if (commandLine.hasOption(flowOption.getOpt()))
+			{
+				String[] values = commandLine.getOptionValues(flowOption.getOpt());
 
-                    setColor(255, 255, 0);
+				//Value
+				float v = 1f;
+				if (values != null && values.length >= 1 && StringUtils.hasLength(values[0]))
+				{
+					v = Float.parseFloat(values[0]);
+				}
 
-                    sleep(200);
-                }
-                return true;
-            }
-//        } else if (split.length == 3)
-//        {
-//            if (split[0].startsWith("0x") &&
-//                    split[1].startsWith("0x") &&
-//                    split[2].startsWith("0x"))
-//            {
-//                split[0] = split[0].replace("0x", "");
-//                split[1] = split[1].replace("0x", "");
-//                split[2] = split[2].replace("0x", "");
-//
-//                return setColor(split, 16);
-//            } else
-//            {
-//                return setColor(split, 10);
-//            }
-//        }
-        return false;
-    }
+				//Hue increment
+				float increment = 0.01f;
+				if (values != null && values.length >= 2 && StringUtils.hasLength(values[1]))
+				{
+					increment = Float.parseFloat(values[1]);
+				}
 
-    protected static boolean setColor(String[] colors, int radix)
-    {
-        try
-        {
-            int r = Integer.parseInt(colors[0], radix);
-            int g = Integer.parseInt(colors[1], radix);
-            int b = Integer.parseInt(colors[2], radix);
+				//Sleep time
+				int sleepMillis = 100;
+				if (values != null && values.length >= 3 && StringUtils.hasLength(values[2]))
+				{
+					sleepMillis = Integer.parseInt(values[2]);
+				}
 
-            return setColor(r, g, b);
-        } catch (NumberFormatException e)
-        {
-            System.out.println("Wrong number format: " + e.getMessage());
-        }
-        return false;
-    }
+				//Saturation
+				float s = 1f;
+				if (values != null && values.length >= 4 && StringUtils.hasLength(values[3]))
+				{
+					s = Float.parseFloat(values[3]);
+				}
 
-    protected static boolean setColor(Color color)
-    {
-        return setColor(color.getRed(), color.getGreen(), color.getBlue());
-    }
+				for (float h = 0; ; h += increment)
+				{
+					setColor(Color.fromHSB(h, s, v));
+					sleep(sleepMillis);
+					try
+					{
+						if (System.in.available() > 0)
+						{
+							return true;
+						}
+					}
+					catch (IOException ignored)
+					{
+					}
+					if (h == 1)
+					{
+						h = 0;
+					}
+				}
+			}
+			else if (commandLine.hasOption(flashOption.getOpt()))
+			{
+				for (int i = 0; i < 20; i++)
+				{
+					Random rnd = new Random(System.currentTimeMillis());
 
-    protected static boolean setColor(int r, int g, int b)
-    {
-        try
-        {
-            System.out.println("Setting color: " + HexUtils.toHexString((byte) r) + " " + HexUtils.toHexString((byte) g) + " " + HexUtils.toHexString((byte) b));
+					int r = rnd.nextInt(256);
+					int g = rnd.nextInt(256);
+					int b = rnd.nextInt(256);
 
-            rgbController.setColor(r, g, b);
+					setColor(r, g, b);
 
-            return true;
-        } catch (RgbControllerException e)
-        {
-            System.out.println("Error setting color: " + e.getMessage());
-        }
-        return false;
-    }
+					sleep(100);
 
-    protected static void sleep(long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-        } catch (InterruptedException e)
-        {
-        }
-    }
+					setColor(0, 0, 0);
+
+					sleep(100);
+				}
+				return true;
+			}
+			else if (commandLine.hasOption(strobeOption.getOpt()))
+			{
+				try
+				{
+					rgbSequencePlayer.play("strobe");
+					return true;
+				}
+				catch (RgbSequencePlayerException e)
+				{
+					System.out.println("Failed to play sequence: " + e.getMessage());
+				}
+				return false;
+			}
+			else if (commandLine.hasOption(stopOption.getOpt()))
+			{
+				rgbSequencePlayer.stop();
+				return true;
+			}
+			else if (commandLine.hasOption(offOption.getOpt()))
+			{
+				return setColor(Color.BLACK);
+			}
+			else
+			{
+				throw new ParseException("Unknown command");
+			}
+		}
+		catch (ParseException e)
+		{
+			System.out.println(e.getMessage());
+
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("start.bat", options);
+		}
+		return false;
+	}
+
+	protected static boolean setColor(String[] colors, int radix)
+	{
+		try
+		{
+			int r = Integer.parseInt(colors[0], radix);
+			int g = Integer.parseInt(colors[1], radix);
+			int b = Integer.parseInt(colors[2], radix);
+
+			return setColor(r, g, b);
+		}
+		catch (NumberFormatException e)
+		{
+			log.error("Invalid number format: " + e.getMessage());
+		}
+		return false;
+	}
+
+	protected static boolean setColor(Color color)
+	{
+		return setColor(color.getRed(), color.getGreen(), color.getBlue());
+	}
+
+	protected static boolean setColor(int r, int g, int b)
+	{
+		try
+		{
+			System.out.println("Setting color: " + HexUtils.toHexString((byte) r) + " " + HexUtils.toHexString((byte) g) + " " + HexUtils.toHexString((byte) b));
+
+			rgbController.setColor(r, g, b);
+
+			return true;
+		}
+		catch (RgbControllerException e)
+		{
+			log.error("Error setting color: " + e.getMessage());
+		}
+		return false;
+	}
+
+	protected static void sleep(long millis)
+	{
+		try
+		{
+			Thread.sleep(millis);
+		}
+		catch (InterruptedException e)
+		{
+		}
+	}
 }

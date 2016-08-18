@@ -1,0 +1,1 @@
+"%JAVA_HOME_X86%\bin\java.exe" -Djava.library.path="%~dp0\..\..\dependencies\rxtx" -jar "%~dp0\..\target\controller-test.jar" -port COM2 %1 %2 %3 %4 %5 %6 %7 %8 %9
