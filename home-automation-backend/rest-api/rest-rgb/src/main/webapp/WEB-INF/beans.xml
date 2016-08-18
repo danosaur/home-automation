@@ -98,7 +98,7 @@
                 <ref bean="strobeColorPattern"/>
                 <ref bean="beatDetectorAudioInputColorPattern"/>
             </list>
-        </property>
+    </property>
     </bean>
 
 </beans>

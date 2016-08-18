@@ -106,7 +106,6 @@
         <module>rgb-controller</module>
         <module>rest-api</module>
         <module>infrastructure</module>
-        <module>dependencies</module>
     </modules>
 
 </project>
