@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Home Automation</string>
+    <string name="title_pattern_detail">Pattern Detail</string>
+    <string name="title_color_picker">Color Picker</string>
+</resources>
