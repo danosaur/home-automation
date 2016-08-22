@@ -1,12 +1,21 @@
 package com.dpingin.homeautomation;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.dpingin.homeautomation.spice.HomeAutomationSpiceService;
 import com.dpingin.homeautomation.spice.request.SetColorRequest;
+import com.dpingin.homeautomation.spice.request.SetColorRequestManager;
 import com.larswerkman.holocolorpicker.ColorPicker;
 import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
@@ -14,7 +23,7 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
-public class ColorPickerActivity extends Activity implements ColorPicker.OnColorChangedListener
+public class ColorPickerActivity extends AppCompatActivity implements ColorPicker.OnColorChangedListener
 {
 	private static final String TAG = "ColorPickerActivity";
 
@@ -23,12 +32,16 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
 	private ColorPicker picker;
 	private ValueBar valueBar;
 	private SaturationBar saturationBar;
+	private SetColorRequestManager setColorRequestManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_colorpicker);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		toolbar.setTitle(getTitle());
 
 		picker = (ColorPicker) findViewById(R.id.picker);
 		valueBar = (ValueBar) findViewById(R.id.valuebar);
@@ -37,6 +50,7 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
 		picker.addValueBar(valueBar);
 		picker.addSaturationBar(saturationBar);
 		picker.setOnColorChangedListener(this);
+		picker.setTouchAnywhereOnColorWheelEnabled(true);
 	}
 
 	@Override
@@ -45,20 +59,22 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
 		Log.d(TAG, Integer.toString(color));
 		picker.setOldCenterColor(color);
 
-		SetColorRequest setColorRequest = new SetColorRequest(color);
-		getSpiceManager().execute(setColorRequest, new SetColorRequestListener());
+		setColorRequestManager.submit(new SetColorRequest(color));
 	}
 
 	@Override
 	protected void onStart()
 	{
 		spiceManager.start(this);
+		setColorRequestManager = new SetColorRequestManager(spiceManager, new SetColorRequestListener())
+				.start();
 		super.onStart();
 	}
 
 	@Override
 	protected void onStop()
 	{
+		setColorRequestManager.stop();
 		spiceManager.shouldStop();
 		super.onStop();
 	}
