@@ -1,54 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/LinearLayout2"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#222"
-    android:orientation="vertical"
-    tools:context="com.dpingin.homeautomation.ColorPickerActivity" >
+    android:fitsSystemWindows="true"
+    tools:context="com.dpingin.homeautomation.ColorPickerActivity">
 
-    <com.larswerkman.holocolorpicker.ColorPicker
-        android:id="@+id/picker"
-        android:layout_width="wrap_content"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:baselineAligned="false">
 
-    <com.larswerkman.holocolorpicker.ValueBar
-        android:id="@+id/valuebar"
-        android:layout_width="322dp"
-        android:layout_height="112dp"
-        android:layout_gravity="center"
-        android:layout_margin="8dip"/>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    <com.larswerkman.holocolorpicker.SaturationBar
-        android:id="@+id/saturationbar"
-        android:layout_width="322dp"
-        android:layout_height="112dp"
-        android:layout_gravity="center"
-        android:layout_margin="8dip"/>
+    </android.support.design.widget.AppBarLayout>
 
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:weightSum="2" >-->
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:orientation="vertical"
+        android:background="#000000">
 
-        <!--<Button-->
-            <!--android:id="@+id/button1"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="Change Color"-->
-            <!--android:layout_weight="1" />-->
 
-        <!--<TextView-->
-            <!--android:id="@+id/textView1"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="Text Color"-->
-            <!--android:textColor="@android:color/white"-->
-            <!--android:textSize="20sp"-->
-            <!--android:layout_weight="1" />-->
+        <com.larswerkman.holocolorpicker.ColorPicker
+            android:id="@+id/picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
-    <!--</LinearLayout>-->
-</LinearLayout>
+        <com.larswerkman.holocolorpicker.ValueBar
+            android:id="@+id/valuebar"
+            android:layout_width="322dp"
+            android:layout_height="112dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dip" />
+
+        <com.larswerkman.holocolorpicker.SaturationBar
+            android:id="@+id/saturationbar"
+            android:layout_width="322dp"
+            android:layout_height="112dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dip" />
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

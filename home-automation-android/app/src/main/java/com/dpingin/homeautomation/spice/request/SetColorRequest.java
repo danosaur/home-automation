@@ -1,7 +1,12 @@
 package com.dpingin.homeautomation.spice.request;
 
 import android.util.Log;
+import android.widget.Toast;
 
+import com.dpingin.homeautomation.ColorPickerActivity;
+import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
 import java.util.HashMap;
@@ -36,4 +41,5 @@ public class SetColorRequest extends SpringAndroidSpiceRequest<String>
 
 		return getRestTemplate().postForObject("http://192.168.1.11:8080/rest-rgb/rest/rgb/rgb?r={r}&g={g}&b={b}", null, String.class, uriVariables);
 	}
+
 }

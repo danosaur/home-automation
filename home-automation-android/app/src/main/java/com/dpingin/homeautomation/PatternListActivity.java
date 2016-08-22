@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.dpingin.homeautomation.dummy.DummyContent;
+import com.dpingin.homeautomation.content.PatternSelectorContent;
 
 import java.util.List;
 
@@ -72,16 +72,16 @@ public class PatternListActivity extends AppCompatActivity
 
 	private void setupRecyclerView(@NonNull RecyclerView recyclerView)
 	{
-		recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+		recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(PatternSelectorContent.ITEMS));
 	}
 
 	public class SimpleItemRecyclerViewAdapter
 			extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>
 	{
 
-		private final List<DummyContent.DummyItem> mValues;
+		private final List<PatternSelectorContent.PatternSelectorItem> mValues;
 
-		public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items)
+		public SimpleItemRecyclerViewAdapter(List<PatternSelectorContent.PatternSelectorItem> items)
 		{
 			mValues = items;
 		}
@@ -98,7 +98,7 @@ public class PatternListActivity extends AppCompatActivity
 		public void onBindViewHolder(final ViewHolder holder, int position)
 		{
 			holder.mItem = mValues.get(position);
-			holder.mIdView.setText(mValues.get(position).id);
+			holder.mDetailsView.setText(mValues.get(position).details);
 			holder.mContentView.setText(mValues.get(position).content);
 
 			holder.mView.setOnClickListener(new View.OnClickListener()
@@ -119,10 +119,20 @@ public class PatternListActivity extends AppCompatActivity
 					else
 					{
 						Context context = v.getContext();
-						Intent intent = new Intent(context, ColorPickerActivity.class);
-						intent.putExtra(PatternDetailFragment.ARG_ITEM_ID, holder.mItem.id);
 
-						context.startActivity(intent);
+						Intent intent = null;
+						switch (holder.mItem.id)
+						{
+							case "static":
+								intent = new Intent(context, ColorPickerActivity.class);
+								break;
+						}
+						if (intent != null)
+						{
+							intent.putExtra(PatternDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+
+							context.startActivity(intent);
+						}
 					}
 				}
 			});
@@ -137,16 +147,16 @@ public class PatternListActivity extends AppCompatActivity
 		public class ViewHolder extends RecyclerView.ViewHolder
 		{
 			public final View mView;
-			public final TextView mIdView;
 			public final TextView mContentView;
-			public DummyContent.DummyItem mItem;
+			public final TextView mDetailsView;
+			public PatternSelectorContent.PatternSelectorItem mItem;
 
 			public ViewHolder(View view)
 			{
 				super(view);
 				mView = view;
-				mIdView = (TextView) view.findViewById(R.id.id);
 				mContentView = (TextView) view.findViewById(R.id.content);
+				mDetailsView = (TextView) view.findViewById(R.id.details);
 			}
 
 			@Override
