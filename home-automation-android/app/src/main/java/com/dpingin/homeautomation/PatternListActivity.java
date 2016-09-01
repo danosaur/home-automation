@@ -15,6 +15,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dpingin.homeautomation.content.PatternSelectorContent;
+import com.dpingin.homeautomation.spice.HomeAutomationSpiceService;
+import com.dpingin.homeautomation.spice.request.GetColorRequest;
+import com.dpingin.homeautomation.spice.request.SelectPatternRequest;
+import com.dpingin.homeautomation.spice.request.SetColorRequest;
+import com.dpingin.homeautomation.spice.request.manager.RequestManager;
+import com.octo.android.robospice.SpiceManager;
 
 import java.util.List;
 
@@ -28,7 +34,9 @@ import java.util.List;
  */
 public class PatternListActivity extends AppCompatActivity
 {
+	private SpiceManager spiceManager = new SpiceManager(HomeAutomationSpiceService.class);
 
+	private RequestManager selectPatternRequestManager;
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
 	 * device.
@@ -68,6 +76,24 @@ public class PatternListActivity extends AppCompatActivity
 			// activity should be in two-pane mode.
 			mTwoPane = true;
 		}
+	}
+
+
+	@Override
+	protected void onStart()
+	{
+		spiceManager.start(this);
+		selectPatternRequestManager = new RequestManager(spiceManager)
+				.start();
+		super.onStart();
+	}
+
+	@Override
+	protected void onStop()
+	{
+		selectPatternRequestManager.stop();
+		spiceManager.shouldStop();
+		super.onStop();
 	}
 
 	private void setupRecyclerView(@NonNull RecyclerView recyclerView)
@@ -124,7 +150,12 @@ public class PatternListActivity extends AppCompatActivity
 						switch (holder.mItem.id)
 						{
 							case "static":
+								selectPatternRequestManager.submit(new SelectPatternRequest(holder.mItem.id), null);
 								intent = new Intent(context, ColorPickerActivity.class);
+								break;
+							case "minim":
+								selectPatternRequestManager.submit(new SelectPatternRequest(holder.mItem.id), null);
+								intent = new Intent(context, MusicControlledActivity.class);
 								break;
 						}
 						if (intent != null)

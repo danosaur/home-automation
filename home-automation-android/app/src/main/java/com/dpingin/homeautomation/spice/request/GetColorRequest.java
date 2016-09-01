@@ -22,7 +22,7 @@ public class GetColorRequest extends SpringAndroidSpiceRequest<Color>
 	{
 		Color c = getRestTemplate().getForObject("http://192.168.1.11:8080/rest-rgb/rest/rgb/rgb", Color.class);
 
-		Log.d(TAG, String.format("r: %d, g: %d, b: %d", c.getRed(), c.getGreen(), c.getBlue()));
+		Log.d(TAG, String.format("Get color: %d, %d, %d", c.getRed(), c.getGreen(), c.getBlue()));
 
 		return c;
 	}
