@@ -17,6 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 /**
  * Created with IntelliJ IDEA.
  * User: DanoSaur
@@ -34,6 +37,7 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     protected AudioListener audioListener;
 
     @Override
+    @PostConstruct
     public void init()
     {
         super.init();
@@ -46,6 +50,7 @@ public class AudioInputColorPattern extends SampleProcessorAwarePattern<SamplePr
     }
 
     @Override
+    @PreDestroy
     public void destroy()
     {
         stop();

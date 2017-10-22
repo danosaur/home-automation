@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: webapp
+pattern:
+  default: static
+  audioInputColorPattern:
+    bufferSize: 1024
+asio:
+  input:
+    driverName: UtrackPro ASIO Driver
+    channelIndex: 7
+rgb:
+  controller:
+    portName: COM2

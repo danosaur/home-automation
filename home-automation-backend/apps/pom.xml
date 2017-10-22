@@ -9,13 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>infrastructure</artifactId>
+    <artifactId>rest-api</artifactId>
     <packaging>pom</packaging>
+
     <modules>
-        <module>audio</module>
-        <module>commons</module>
-		<module>daemon-integration</module>
+        <!--<module>rest-rgb</module>-->
+		<module>webapp</module>
+        <module>console-app</module>
     </modules>
-
-
 </project>

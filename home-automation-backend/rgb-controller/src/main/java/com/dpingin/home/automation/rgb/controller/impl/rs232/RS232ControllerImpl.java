@@ -4,7 +4,8 @@ import com.dpingin.home.automation.rgb.controller.api.rs232.RS232Controller;
 import com.dpingin.home.automation.rgb.controller.api.rs232.RS232ControllerException;
 import com.dpingin.home.automation.rgb.controller.util.HexUtils;
 import gnu.io.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +23,7 @@ public class RS232ControllerImpl implements SerialPortEventListener, RS232Contro
 {
     final static int TIMEOUT = 2000;
     final static int NEW_LINE_ASCII = 10;
-    private final Logger log = Logger.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     protected List<Byte> dataRead = new ArrayList();
     private HashMap<String, CommPortIdentifier> portMap = new HashMap();
     private SerialPort serialPort = null;

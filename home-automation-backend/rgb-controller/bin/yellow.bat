@@ -1,1 +1,0 @@
-start.bat -color #ffff00

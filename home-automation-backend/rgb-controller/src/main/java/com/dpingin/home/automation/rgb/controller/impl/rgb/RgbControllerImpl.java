@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Set;
 
 /**
@@ -28,6 +30,7 @@ public class RgbControllerImpl implements RgbController
 	protected RS232Controller rs232Controller;
 	protected Color color = Color.BLACK;
 
+	@PostConstruct
 	public void init() throws RgbControllerException
 	{
 		try
@@ -59,6 +62,7 @@ public class RgbControllerImpl implements RgbController
 		}
 	}
 
+	@PreDestroy
 	public void destroy()
 	{
 		try

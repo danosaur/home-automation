@@ -1,0 +1,1 @@
+java -Djava.library.path="E:\dev\Workspace\home-automation\home-automation-backend\dependencies\jasiohost;E:\dev\RxTx\mfz-rxtx-2.2-20081207-win-x64" -cp "%~dp0../lib/*" com.dpingin.home.automation.console.Application
