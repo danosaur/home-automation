@@ -14,7 +14,7 @@ public class AudioConfiguration
 	@Value("${asio.input.driverName}")
 	private String driverName;
 
-	@Value("${asio.input.channelIndex}")
+	@Value("${asio.input.channelIndex:1}")
 	private int channelIndex;
 
 	@Bean
@@ -22,7 +22,7 @@ public class AudioConfiguration
 	{
 		AsioAudioInputProviderImpl asioAudioInputProvider = new AsioAudioInputProviderImpl();
 		asioAudioInputProvider.setDriverName(driverName);
-		asioAudioInputProvider.setChannelIndex(7);
+		asioAudioInputProvider.setChannelIndex(channelIndex);
 		return asioAudioInputProvider;
 	}
 
