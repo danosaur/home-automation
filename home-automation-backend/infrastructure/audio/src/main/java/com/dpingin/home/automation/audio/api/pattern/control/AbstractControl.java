@@ -53,6 +53,8 @@ public class AbstractControl<T extends Comparable<T>> implements Control<T>
     @Override
     public T getValue()
     {
+        if (value == null)
+            value = defaultValue;
         return value;
     }
 
