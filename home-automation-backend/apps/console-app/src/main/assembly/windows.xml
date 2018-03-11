@@ -15,15 +15,7 @@
 		</dependencySet>
 	</dependencySets>
 
-	<!-- Workaround to create logs directory -->
 	<fileSets>
-		<fileSet>
-			<directory>${dist.dir}</directory>
-			<outputDirectory>logs</outputDirectory>
-			<excludes>
-				<exclude>*/**</exclude>
-			</excludes>
-		</fileSet>
 		<fileSet>
 			<directory>${dist.dir}/bin</directory>
 			<outputDirectory>bin</outputDirectory>

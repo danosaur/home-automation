@@ -205,7 +205,7 @@ public class InputHandler
 			System.out.println(e.getMessage());
 
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("start-console-app.bat [OPTIONS]", options);
+			formatter.printHelp("start.bat [OPTIONS]", options);
 		}
 		return false;
 	}
