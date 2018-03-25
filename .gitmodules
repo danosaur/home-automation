@@ -1,6 +1,6 @@
 [submodule "home-automation-backend/dependencies/jasiohost"]
 	path = home-automation-backend/dependencies/jasiohost
-	url = https://github.com/danosaur/jasiohost
+	url = https://github.com/danosaur/jasiohost.git
 [submodule "home-automation-backend/dependencies/minim"]
 	path = home-automation-backend/dependencies/minim
-	url = https://github.com/danosaur/minim
+	url = https://github.com/danosaur/minim.git
