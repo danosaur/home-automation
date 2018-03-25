@@ -5,7 +5,6 @@ import com.dpingin.home.automation.pattern.api.control.Control;
 import com.dpingin.home.automation.pattern.api.control.Controls;
 import com.dpingin.home.automation.pattern.api.switcher.PattenSwitcherException;
 import com.dpingin.home.automation.pattern.api.switcher.PatternSwitcher;
-import com.dpingin.home.automation.pattern.impl.StaticColorPattern;
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +26,6 @@ import java.util.List;
 @RequestMapping("/led")
 public class LedController
 {
-	@Autowired
-	private StaticColorPattern staticColorPattern;
-
 	@Autowired
 	private PatternSwitcher patternSwitcher;
 
