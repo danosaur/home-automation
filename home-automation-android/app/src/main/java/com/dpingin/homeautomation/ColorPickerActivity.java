@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.dpingin.homeautomation.spice.HomeAutomationSpiceService;
 import com.dpingin.homeautomation.spice.request.GetColorRequest;
 import com.dpingin.homeautomation.spice.request.SetColorRequest;
@@ -18,15 +17,23 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class ColorPickerActivity extends AppCompatActivity implements ColorPicker.OnColorChangedListener, ValueBar.OnValueChangedListener, SaturationBar.OnSaturationChangedListener
 {
 	private static final String TAG = "ColorPickerActivity";
 
 	private SpiceManager spiceManager = new SpiceManager(HomeAutomationSpiceService.class);
 
-	private ColorPicker picker;
+	private ColorPicker colorPicker;
 	private ValueBar valueBar;
 	private SaturationBar saturationBar;
+
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+	private ScheduledFuture<?> scheduledFuture;
 
 	private RequestManager setColorRequestManager;
 	private RequestManager getColorRequestManager;
@@ -43,47 +50,47 @@ public class ColorPickerActivity extends AppCompatActivity implements ColorPicke
 		setSupportActionBar(toolbar);
 		toolbar.setTitle(getTitle());
 
-		picker = (ColorPicker) findViewById(R.id.picker);
 		valueBar = (ValueBar) findViewById(R.id.valuebar);
 		valueBar.setOnValueChangedListener(this);
 		saturationBar = (SaturationBar) findViewById(R.id.saturationbar);
 		saturationBar.setOnSaturationChangedListener(this);
 
-		picker.addValueBar(valueBar);
-		picker.addSaturationBar(saturationBar);
-		picker.setOnColorChangedListener(this);
-		picker.setTouchAnywhereOnColorWheelEnabled(true);
+		colorPicker = (ColorPicker) findViewById(R.id.picker);
+		colorPicker.addValueBar(valueBar);
+		colorPicker.addSaturationBar(saturationBar);
+		colorPicker.setOnColorChangedListener(this);
+		colorPicker.setTouchAnywhereOnColorWheelEnabled(true);
+		colorPicker.setShowOldCenterColor(false);
 	}
 
 	@Override
 	public void onColorChanged(int color)
 	{
 		Log.d(TAG, Integer.toString(color));
-		picker.setOldCenterColor(color);
 
-		setColorRequestManager.submit(new SetColorRequest(color), setColorRequestListener);
+		setColorRequestManager.submit(new SetColorRequest(new Color(color)), setColorRequestListener);
 	}
 
 	@Override
 	public void onSaturationChanged(int saturation)
 	{
-		int color = picker.getColor();
+		int color = colorPicker.getColor();
 
 		Log.d(TAG, Integer.toString(color));
-		picker.setOldCenterColor(color);
+		colorPicker.setOldCenterColor(color);
 
-		setColorRequestManager.submit(new SetColorRequest(color), setColorRequestListener);
+		setColorRequestManager.submit(new SetColorRequest(new Color(color)), setColorRequestListener);
 	}
 
 	@Override
 	public void onValueChanged(int value)
 	{
-		int color = picker.getColor();
+		int color = colorPicker.getColor();
 
 		Log.d(TAG, Integer.toString(color));
-		picker.setOldCenterColor(color);
+		colorPicker.setOldCenterColor(color);
 
-		setColorRequestManager.submit(new SetColorRequest(color), setColorRequestListener);
+		setColorRequestManager.submit(new SetColorRequest(new Color(color)), setColorRequestListener);
 	}
 
 
@@ -91,20 +98,31 @@ public class ColorPickerActivity extends AppCompatActivity implements ColorPicke
 	protected void onStart()
 	{
 		spiceManager.start(this);
-		setColorRequestManager = new RequestManager(spiceManager)
-				.start();
-		getColorRequestManager = new RequestManager(spiceManager)
-				.start();
-		getColorRequestManager.submit(new GetColorRequest(), getColorRequestListener);
+
+		setColorRequestManager = new RequestManager(spiceManager).start();
+		getColorRequestManager = new RequestManager(spiceManager).start();
+
+		scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run()
+			{
+				getColorRequestManager.submit(new GetColorRequest(), getColorRequestListener);
+			}
+		}, 0, 1, TimeUnit.SECONDS);
+
 		super.onStart();
 	}
 
 	@Override
 	protected void onStop()
 	{
+		scheduledFuture.cancel(true);
+
 		setColorRequestManager.stop();
 		getColorRequestManager.stop();
+
 		spiceManager.shouldStop();
+		
 		super.onStop();
 	}
 
@@ -113,7 +131,7 @@ public class ColorPickerActivity extends AppCompatActivity implements ColorPicke
 		return spiceManager;
 	}
 
-	public final class SetColorRequestListener implements RequestListener<String>
+	public final class SetColorRequestListener implements RequestListener<Color>
 	{
 
 		@Override
@@ -123,9 +141,9 @@ public class ColorPickerActivity extends AppCompatActivity implements ColorPicke
 		}
 
 		@Override
-		public void onRequestSuccess(final String result)
+		public void onRequestSuccess(final Color result)
 		{
-			Log.d(TAG, result);
+			Log.d(TAG, "Set color: " + result);
 		}
 	}
 
@@ -141,8 +159,9 @@ public class ColorPickerActivity extends AppCompatActivity implements ColorPicke
 		@Override
 		public void onRequestSuccess(final Color color)
 		{
-			picker.setColor(color.getColor());
-			picker.setOldCenterColor(color.getColor());
+			colorPicker.setOnColorChangedListener(null);
+			colorPicker.setColor(color.getColor());
+			colorPicker.setOnColorChangedListener(ColorPickerActivity.this);
 		}
 	}
 }

@@ -1,45 +1,38 @@
 package com.dpingin.homeautomation.spice.request;
 
+import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.dpingin.homeautomation.ColorPickerActivity;
-import com.octo.android.robospice.SpiceManager;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
+import com.dpingin.homeautomation.types.Color;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
 
-public class SetColorRequest extends SpringAndroidSpiceRequest<String>
+public class SetColorRequest extends SpringAndroidSpiceRequest<Color>
 {
 	private static final String TAG = "SetColorRequest";
 
-	private int color;
+	private Color color;
 
-	public SetColorRequest(int color)
+	public SetColorRequest(Color color)
 	{
-		super(String.class);
+		super(Color.class);
 		this.color = color;
 	}
 
 	@Override
-	public String loadDataFromNetwork() throws Exception
+	public Color loadDataFromNetwork() throws Exception
 	{
+		Log.d(TAG, String.format("r: %d, g: %d, b: %d", color.getRed(), color.getGreen(), color.getBlue()));
 
-		int r = (0x00ff0000 & color) >> 16;
-		int g = (0x0000ff00 & color) >> 8;
-		int b = (0x000000ff & color);
+		String uriString = new Uri.Builder()
+				.scheme("http")
+				.encodedAuthority("192.168.1.11:8080")
+				.appendPath("led")
+				.appendPath("rgb")
+				.build()
+				.toString();
 
-		Log.d(TAG, String.format("r: %d, g: %d, b: %d", r, g, b));
-
-		Map<String, Integer> uriVariables = new HashMap<>();
-		uriVariables.put("r", r);
-		uriVariables.put("g", g);
-		uriVariables.put("b", b);
-
-		return getRestTemplate().postForObject("http://192.168.1.11:8080/rest-rgb/rest/rgb/rgb?r={r}&g={g}&b={b}", null, String.class, uriVariables);
+		return getRestTemplate().postForObject(new URI(uriString), color, Color.class);
 	}
 
 }

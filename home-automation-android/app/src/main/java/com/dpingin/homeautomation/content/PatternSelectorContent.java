@@ -15,6 +15,7 @@ public class PatternSelectorContent
 	{
 		addItem(createItem("static", "Static Color", "Set static color using color picker"));
 		addItem(createItem("minim", "Music Controlled", "Frequency-based RGB mapping"));
+		addItem(createItem("flow", "Flow", "Flow of colors"));
 	}
 
 	private static void addItem(PatternSelectorItem item)

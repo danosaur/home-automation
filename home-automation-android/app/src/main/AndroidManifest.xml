@@ -49,6 +49,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.dpingin.homeautomation.PatternListActivity" />
         </activity>
+        <activity
+            android:name=".FlowActivity"
+            android:label="@string/title_flow"
+            android:parentActivityName=".PatternListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.dpingin.homeautomation.PatternListActivity" />
+        </activity>
 
         <service
             android:name="com.dpingin.homeautomation.spice.HomeAutomationSpiceService"

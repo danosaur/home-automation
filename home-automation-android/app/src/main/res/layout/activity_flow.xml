@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.dpingin.homeautomation.FlowActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:baselineAligned="false">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout android:id="@+id/linearLayout" android:layout_width="match_parent"
+        android:layout_height="match_parent" app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:orientation="vertical" android:background="@android:color/black">
+
+        <com.larswerkman.holocolorpicker.ColorPicker android:id="@+id/picker" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_gravity="center" />
+        <TextView android:text="Speed" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:id="@+id/textViewSpeed" android:textColor="@color/colorAccent" />
+        <SeekBar android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/seekBarSpeed"
+            android:max="600" style="@android:style/Widget.Material.Light.SeekBar" />
+        <TextView android:text="Value" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:id="@+id/textViewValue" android:textColor="@color/colorAccent" />
+        <com.larswerkman.holocolorpicker.ValueBar android:id="@+id/valuebar" android:layout_width="322dp"
+            android:layout_height="112dp" android:layout_gravity="center" android:layout_margin="8dip" />
+
+        <!--<SeekBar android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/seekBarValue"-->
+        <!--android:max="1000" style="@android:style/Widget.Material.Light.SeekBar" />-->
+        <TextView android:text="Saturation" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:id="@+id/textViewSaturation" android:textColor="@color/colorAccent" />
+        <com.larswerkman.holocolorpicker.SaturationBar android:id="@+id/saturationbar" android:layout_width="322dp"
+            android:layout_height="112dp" android:layout_gravity="center" android:layout_margin="8dip" />
+        <!--<SeekBar android:layout_width="match_parent" android:layout_height="wrap_content"-->
+        <!--android:id="@+id/seekBarSaturation" android:max="1000" style="@android:style/Widget.Material.Light.SeekBar" />-->
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

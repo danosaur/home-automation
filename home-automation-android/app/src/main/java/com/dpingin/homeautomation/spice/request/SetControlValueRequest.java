@@ -6,22 +6,26 @@ import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceReques
 
 import java.net.URI;
 
-public class SelectPatternRequest extends SpringAndroidSpiceRequest<Void>
+public class SetControlValueRequest extends SpringAndroidSpiceRequest<Void>
 {
-	private static final String TAG = "SelectPatternRequest";
+	private static final String TAG = "SetControlValueRequest";
 
 	private String patternName;
+	private String controlName;
+	private Object value;
 
-	public SelectPatternRequest(String patternName)
+	public SetControlValueRequest(String patternName, String controlName, Object value)
 	{
 		super(Void.class);
 		this.patternName = patternName;
+		this.controlName = controlName;
+		this.value = value;
 	}
 
 	@Override
 	public Void loadDataFromNetwork() throws Exception
 	{
-		Log.d(TAG, String.format("Selecting pattern: %s", patternName));
+		Log.d(TAG, String.format("Setting value of pattern's {%s} control {%s} to {%s}", patternName, controlName, value));
 
 		String uriString = new Uri.Builder()
 				.scheme("http")
@@ -29,10 +33,12 @@ public class SelectPatternRequest extends SpringAndroidSpiceRequest<Void>
 				.appendPath("led")
 				.appendPath("patterns")
 				.appendPath(patternName)
+				.appendPath("controls")
+				.appendPath(controlName)
 				.build()
 				.toString();
 
-		return getRestTemplate().postForObject(new URI(uriString), null, Void.class);
+		return getRestTemplate().postForObject(new URI(uriString), value, Void.class);
 	}
 
 }
