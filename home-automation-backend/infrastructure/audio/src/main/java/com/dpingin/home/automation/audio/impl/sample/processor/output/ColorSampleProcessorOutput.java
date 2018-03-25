@@ -12,20 +12,20 @@ import com.dpingin.home.automation.rgb.controller.api.color.Color;
  */
 public class ColorSampleProcessorOutput extends AbstractSampleProcessorOutput
 {
-    protected Color color;
+	protected Color color;
 
-    public ColorSampleProcessorOutput()
-    {
-    }
+	public ColorSampleProcessorOutput()
+	{
+	}
 
-    public ColorSampleProcessorOutput(Color value)
-    {
-        this.color = value;
-    }
+	public ColorSampleProcessorOutput(Color value)
+	{
+		this.color = value;
+	}
 
-    @Override
-    public Color getValue()
-    {
-        return color;
-    }
+	@Override
+	public Color getValue()
+	{
+		return color;
+	}
 }

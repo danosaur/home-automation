@@ -9,13 +9,13 @@ package com.dpingin.home.automation.rgb.controller.api.rgb;
  */
 public class RgbControllerException extends Exception
 {
-    public RgbControllerException(String message)
-    {
-        super(message);
-    }
+	public RgbControllerException(String message)
+	{
+		super(message);
+	}
 
-    public RgbControllerException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public RgbControllerException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
 }

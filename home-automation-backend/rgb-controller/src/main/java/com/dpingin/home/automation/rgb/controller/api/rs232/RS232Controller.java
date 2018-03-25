@@ -11,12 +11,17 @@ import java.util.Set;
  */
 public interface RS232Controller
 {
-    Set<String> enumeratePorts();
-    void connect(String portName) throws RS232ControllerException;
-    void initListener() throws RS232ControllerException;
-    void disconnect() throws RS232ControllerException;
+	Set<String> enumeratePorts();
 
-    void writeData(byte[] data) throws RS232ControllerException;
-    byte[] readData() throws RS232ControllerException;
-    byte[] readDataNonBlocking() throws RS232ControllerException;
+	void connect(String portName) throws RS232ControllerException;
+
+	void initListener() throws RS232ControllerException;
+
+	void disconnect() throws RS232ControllerException;
+
+	void writeData(byte[] data) throws RS232ControllerException;
+
+	byte[] readData() throws RS232ControllerException;
+
+	byte[] readDataNonBlocking() throws RS232ControllerException;
 }

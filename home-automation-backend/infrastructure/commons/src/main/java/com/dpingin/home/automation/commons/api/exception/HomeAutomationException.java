@@ -9,27 +9,27 @@ package com.dpingin.home.automation.commons.api.exception;
  */
 public class HomeAutomationException extends Exception
 {
-    public HomeAutomationException()
-    {
-    }
+	public HomeAutomationException()
+	{
+	}
 
-    public HomeAutomationException(String message)
-    {
-        super(message);
-    }
+	public HomeAutomationException(String message)
+	{
+		super(message);
+	}
 
-    public HomeAutomationException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public HomeAutomationException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
 
-    public HomeAutomationException(Throwable cause)
-    {
-        super(cause);
-    }
+	public HomeAutomationException(Throwable cause)
+	{
+		super(cause);
+	}
 
-    public HomeAutomationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+	public HomeAutomationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+	{
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 }

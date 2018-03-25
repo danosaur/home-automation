@@ -9,29 +9,29 @@ package com.dpingin.home.automation.rgb.controller.util;
  */
 public class HexUtils
 {
-    public static final byte[] fromHexString(final String s)
-    {
-        String[] v = s.split(" ");
-        byte[] arr = new byte[v.length];
-        int i = 0;
-        for (String val : v)
-        {
-            arr[i++] = Integer.decode("0x" + val).byteValue();
+	public static final byte[] fromHexString(final String s)
+	{
+		String[] v = s.split(" ");
+		byte[] arr = new byte[v.length];
+		int i = 0;
+		for (String val : v)
+		{
+			arr[i++] = Integer.decode("0x" + val).byteValue();
 
-        }
-        return arr;
-    }
+		}
+		return arr;
+	}
 
-    public static String toHexString(byte[] data)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (byte b : data)
-            stringBuilder.append(toHexString(b)).append(" ");
-        return stringBuilder.toString();
-    }
+	public static String toHexString(byte[] data)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		for (byte b : data)
+			stringBuilder.append(toHexString(b)).append(" ");
+		return stringBuilder.toString();
+	}
 
-    public static String toHexString(byte data)
-    {
-        return String.format("0x%02X", data);
-    }
+	public static String toHexString(byte data)
+	{
+		return String.format("0x%02X", data);
+	}
 }

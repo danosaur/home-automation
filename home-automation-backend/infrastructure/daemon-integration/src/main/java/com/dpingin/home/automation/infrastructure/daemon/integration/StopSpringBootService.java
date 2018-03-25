@@ -21,9 +21,11 @@ package com.dpingin.home.automation.infrastructure.daemon.integration;
  *
  * @author Stephane Nicoll
  */
-public class StopSpringBootService {
+public class StopSpringBootService
+{
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception
+	{
 		new SpringBootService().stop(args);
 	}
 

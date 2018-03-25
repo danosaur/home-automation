@@ -11,5 +11,5 @@ import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
  */
 public interface AudioInputProvider
 {
-    AudioInput getAudioInput();
+	AudioInput getAudioInput();
 }

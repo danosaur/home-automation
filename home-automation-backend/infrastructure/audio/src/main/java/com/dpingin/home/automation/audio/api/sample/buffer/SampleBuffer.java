@@ -9,10 +9,10 @@ package com.dpingin.home.automation.audio.api.sample.buffer;
  */
 public interface SampleBuffer
 {
-    void addSamples(float[] samples);
+	void addSamples(float[] samples);
 
-    float[] getSamples();
+	float[] getSamples();
 
-    void reset();
+	void reset();
 
 }

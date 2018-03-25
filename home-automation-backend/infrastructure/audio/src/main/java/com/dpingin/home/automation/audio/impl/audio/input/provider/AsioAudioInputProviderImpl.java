@@ -25,6 +25,7 @@ public class AsioAudioInputProviderImpl extends AbstractAudioInputProvider
 	private final static Logger log = LoggerFactory.getLogger(MinimAudioInputProviderImpl.class);
 
 	protected String driverName;
+
 	protected int channelIndex;
 
 	protected AsioDriver asioDriver;

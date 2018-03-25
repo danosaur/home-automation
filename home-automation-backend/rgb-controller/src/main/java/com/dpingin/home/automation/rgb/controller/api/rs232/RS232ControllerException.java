@@ -9,13 +9,13 @@ package com.dpingin.home.automation.rgb.controller.api.rs232;
  */
 public class RS232ControllerException extends Exception
 {
-    public RS232ControllerException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public RS232ControllerException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
 
-    public RS232ControllerException(String message)
-    {
-        super(message);
-    }
+	public RS232ControllerException(String message)
+	{
+		super(message);
+	}
 }

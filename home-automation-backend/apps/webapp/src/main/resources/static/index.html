@@ -2,38 +2,45 @@
 <html>
 
 <head>
-    <title>Color Picker</title>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="components/platform/platform.js"></script>
-    <script src="js/jquery-2.1.1.js"></script>
-    <script src="js/raphael.js"></script>
-    <script src="js/colorwheel.js"></script>
-    <link rel='stylesheet' href='styles/jquery.colors.pickers.hslCircle.css'/>
-    <link rel="import" href="components/font-roboto/roboto.html">
-    <link rel="import" href="components/core-header-panel/core-header-panel.html">
-    <link rel="import" href="components/core-toolbar/core-toolbar.html">
-    <link rel="import" href="components/paper-tabs/paper-tabs.html">
-    <link rel="import" href="controls/color-wheel.html">
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            background-color: #666;
-        }
+  <title>Color Picker</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <script src="components/platform/platform.js"></script>
+  <script src="js/jquery-2.1.1.js"></script>
+  <script src="js/raphael.js"></script>
+  <script src="js/colorwheel.js"></script>
+  <link rel='stylesheet' href='styles/jquery.colors.pickers.hslCircle.css'/>
+  <link rel="import" href="components/font-roboto/roboto.html">
+  <link rel="import" href="components/core-header-panel/core-header-panel.html">
+  <link rel="import" href="components/core-toolbar/core-toolbar.html">
+  <link rel="import" href="components/paper-tabs/paper-tabs.html">
+  <link rel="import" href="controls/color-wheel.html">
+  <link rel="import" href="controls/pattern-switcher.html">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-color: #666;
+    }
 
-        core-header-panel {
-            height: 100%;
-        }
-    </style>
+    core-header-panel {
+      height: 100%;
+    }
+  </style>
 </head>
 
 <body unresolved>
 
 <core-header-panel>
 
+  <div>
+    <pattern-switcher></pattern-switcher>
+  </div>
+
+  <div>
     <color-wheel>
-        <div class="color-wheel-wrapper"></div>
+      <div class="color-wheel-wrapper"></div>
     </color-wheel>
+  </div>
 
 </core-header-panel>
 

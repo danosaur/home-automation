@@ -17,25 +17,16 @@
 package com.dpingin.home.automation.console;
 
 import com.dpingin.home.automation.console.input.InputHandler;
-import com.dpingin.home.automation.rgb.controller.api.color.Color;
-import com.dpingin.home.automation.rgb.controller.api.rgb.RgbController;
-import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
 import com.dpingin.home.automation.rgb.controller.configuration.RgbControllerConfiguration;
-import com.dpingin.home.automation.rgb.controller.util.HexUtils;
-import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Random;
 
 @SpringBootApplication
 @Import(RgbControllerConfiguration.class)

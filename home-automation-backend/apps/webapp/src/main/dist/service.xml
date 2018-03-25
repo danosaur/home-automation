@@ -11,7 +11,9 @@
 	<startargument>-Dcom.sun.management.jmxremote.port=@dist.jmx.port@</startargument>
 	<startargument>-Dcom.sun.management.jmxremote.authenticate=false</startargument>
 	<startargument>-Dcom.sun.management.jmxremote.ssl=false</startargument>
-	<startargument>-Djava.library.path="E:\dev\Workspace\home-automation\home-automation-backend\dependencies\jasiohost;E:\dev\RxTx\mfz-rxtx-2.2-20081207-win-x64"</startargument>
+	<startargument>
+		-Djava.library.path="E:\dev\Workspace\home-automation\home-automation-backend\dependencies\jasiohost;E:\dev\RxTx\mfz-rxtx-2.2-20081207-win-x64"
+	</startargument>
 	<startargument>-cp</startargument>
 	<startargument>lib/*</startargument>
 	<startargument>com.dpingin.home.automation.infrastructure.daemon.integration.StartSpringBootService</startargument>

@@ -1,0 +1,24 @@
+﻿<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/paper-button/paper-button.html">
+<link rel='stylesheet' href='../components/paper-button/paper-button.css'/>
+
+<polymer-element name="pattern-switcher">
+  <template>
+    <paper-button raisedButton on-click="{{staticPattern}}">Static</paper-button>
+    <paper-button raisedButton on-click="{{minimPattern}}">Music</paper-button>
+    <paper-button raisedButton on-click="{{flowPattern}}">Flow</paper-button>
+  </template>
+  <script>
+		Polymer('pattern-switcher', {
+			staticPattern: function (e) {
+				$.post("led/patterns/static")
+			},
+			minimPattern: function (e) {
+				$.post("led/patterns/minim")
+			},
+			flowPattern: function (e) {
+				$.post("led/patterns/flow")
+			}
+		})
+  </script>
+</polymer-element>

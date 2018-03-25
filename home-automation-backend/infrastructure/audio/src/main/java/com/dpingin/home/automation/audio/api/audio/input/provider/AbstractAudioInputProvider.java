@@ -11,21 +11,21 @@ import com.dpingin.home.automation.audio.api.audio.input.AudioInput;
  */
 public abstract class AbstractAudioInputProvider implements AudioInputProvider
 {
-    protected AudioInput audioInput;
+	protected AudioInput audioInput;
 
-    public void init() throws AudioInputProviderException
-    {
+	public void init() throws AudioInputProviderException
+	{
 
-    }
+	}
 
-    public void destroy() throws AudioInputProviderException
-    {
+	public void destroy() throws AudioInputProviderException
+	{
 
-    }
+	}
 
-    @Override
-    public AudioInput getAudioInput()
-    {
-        return audioInput;
-    }
+	@Override
+	public AudioInput getAudioInput()
+	{
+		return audioInput;
+	}
 }

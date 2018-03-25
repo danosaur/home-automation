@@ -9,5 +9,5 @@ package com.dpingin.home.automation.audio.api.sample.processor;
  */
 public interface SampleProcessorOutput<T>
 {
-    T getValue();
+	T getValue();
 }

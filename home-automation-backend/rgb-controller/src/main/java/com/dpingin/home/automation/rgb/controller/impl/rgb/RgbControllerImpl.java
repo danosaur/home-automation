@@ -27,7 +27,9 @@ public class RgbControllerImpl implements RgbController
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	protected String portName;
+
 	protected RS232Controller rs232Controller;
+
 	protected Color color = Color.BLACK;
 
 	@PostConstruct
@@ -38,14 +40,10 @@ public class RgbControllerImpl implements RgbController
 			Set<String> ports = rs232Controller.enumeratePorts();
 			if (!ports.contains(portName))
 			{
-				StringBuilder stringBuilder = new StringBuilder().append("Port ")
-																 .append(portName)
-																 .append(" not found. Available ports:")
-																 .append(System.lineSeparator());
+				StringBuilder stringBuilder = new StringBuilder().append("Port ").append(portName).append(" not found. Available ports:").append(System.lineSeparator());
 				for (String port : ports)
 				{
-					stringBuilder.append(port)
-								 .append(System.lineSeparator());
+					stringBuilder.append(port).append(System.lineSeparator());
 				}
 
 				throw new RgbControllerException(stringBuilder.toString());
@@ -100,9 +98,9 @@ public class RgbControllerImpl implements RgbController
 		try
 		{
 			byte[] data = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-			data[2] = (byte) ((byte) r & 0xFF);
-			data[3] = (byte) ((byte) g & 0xFF);
-			data[4] = (byte) ((byte) b & 0xFF);
+			data[2] = (byte)((byte)r & 0xFF);
+			data[3] = (byte)((byte)g & 0xFF);
+			data[4] = (byte)((byte)b & 0xFF);
 
 			byte[] crc16 = CrcUtils.calculateCrc16(data);
 

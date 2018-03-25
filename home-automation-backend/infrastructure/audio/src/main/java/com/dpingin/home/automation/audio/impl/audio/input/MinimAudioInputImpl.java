@@ -13,74 +13,74 @@ import ddf.minim.AudioListener;
  */
 public class MinimAudioInputImpl implements AudioInput
 {
-    ddf.minim.AudioInput audioInput;
+	ddf.minim.AudioInput audioInput;
 
-    public MinimAudioInputImpl()
-    {
-    }
+	public MinimAudioInputImpl()
+	{
+	}
 
-    public MinimAudioInputImpl(ddf.minim.AudioInput audioInput)
-    {
-        this.audioInput = audioInput;
-    }
+	public MinimAudioInputImpl(ddf.minim.AudioInput audioInput)
+	{
+		this.audioInput = audioInput;
+	}
 
-    @Override
-    public float getSampleRate()
-    {
-        return audioInput.sampleRate();
-    }
+	@Override
+	public float getSampleRate()
+	{
+		return audioInput.sampleRate();
+	}
 
-    @Override
-    public int getBufferSize()
-    {
-        return audioInput.bufferSize();
-    }
+	@Override
+	public int getBufferSize()
+	{
+		return audioInput.bufferSize();
+	}
 
-    @Override
-    public void addListener(AudioListener audioListener)
-    {
-        audioInput.addListener(audioListener);
-    }
+	@Override
+	public void addListener(AudioListener audioListener)
+	{
+		audioInput.addListener(audioListener);
+	}
 
-    @Override
-    public void removeListener(AudioListener audioListener)
-    {
-        audioInput.removeListener(audioListener);
-    }
+	@Override
+	public void removeListener(AudioListener audioListener)
+	{
+		audioInput.removeListener(audioListener);
+	}
 
-    @Override
-    public void init()
-    {
-    }
+	@Override
+	public void init()
+	{
+	}
 
-    @Override
-    public void destroy()
-    {
-        this.audioInput.close();
-    }
+	@Override
+	public void destroy()
+	{
+		this.audioInput.close();
+	}
 
-    @Override
-    public void start() throws AudioInputException
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public void start() throws AudioInputException
+	{
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    @Override
-    public void stop()
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public void stop()
+	{
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    public void setAudioInput(ddf.minim.AudioInput audioInput)
-    {
-        this.audioInput = audioInput;
-    }
+	public void setAudioInput(ddf.minim.AudioInput audioInput)
+	{
+		this.audioInput = audioInput;
+	}
 
-    public MinimAudioInputImpl audioInput(final ddf.minim.AudioInput audioInput)
-    {
-        this.audioInput = audioInput;
-        return this;
-    }
+	public MinimAudioInputImpl audioInput(final ddf.minim.AudioInput audioInput)
+	{
+		this.audioInput = audioInput;
+		return this;
+	}
 
 
 }

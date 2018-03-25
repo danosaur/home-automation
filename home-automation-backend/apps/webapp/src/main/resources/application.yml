@@ -12,3 +12,6 @@ asio:
 rgb:
   controller:
     portName: COM2
+logging:
+  level:
+    com.dpingin.home.automation: info

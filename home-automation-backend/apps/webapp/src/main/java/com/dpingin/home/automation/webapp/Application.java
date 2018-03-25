@@ -16,19 +16,17 @@
 
 package com.dpingin.home.automation.webapp;
 
-import com.dpingin.home.automation.audio.impl.configuration.PatternSwitcherConfiguration;
+import com.dpingin.home.automation.pattern.impl.configuration.PatternSwitcherConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @Import(PatternSwitcherConfiguration.class)
 public class Application
 {
-
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		SpringApplication.run(Application.class, args);
 	}
 }

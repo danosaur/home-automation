@@ -1,6 +1,5 @@
 package com.dpingin.home.automation.console.input;
 
-import com.dpingin.home.automation.console.Application;
 import com.dpingin.home.automation.rgb.controller.api.color.Color;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbController;
 import com.dpingin.home.automation.rgb.controller.api.rgb.RgbControllerException;
@@ -236,7 +235,7 @@ public class InputHandler
 	{
 		try
 		{
-			System.out.println("Setting color: " + HexUtils.toHexString((byte) r) + " " + HexUtils.toHexString((byte) g) + " " + HexUtils.toHexString((byte) b));
+			System.out.println("Setting color: " + HexUtils.toHexString((byte)r) + " " + HexUtils.toHexString((byte)g) + " " + HexUtils.toHexString((byte)b));
 
 			rgbController.setColor(r, g, b);
 

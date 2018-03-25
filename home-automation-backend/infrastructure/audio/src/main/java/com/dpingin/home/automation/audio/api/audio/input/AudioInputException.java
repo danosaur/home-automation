@@ -11,27 +11,27 @@ import com.dpingin.home.automation.commons.api.exception.HomeAutomationException
  */
 public class AudioInputException extends HomeAutomationException
 {
-    public AudioInputException()
-    {
-    }
+	public AudioInputException()
+	{
+	}
 
-    public AudioInputException(String message)
-    {
-        super(message);
-    }
+	public AudioInputException(String message)
+	{
+		super(message);
+	}
 
-    public AudioInputException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public AudioInputException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
 
-    public AudioInputException(Throwable cause)
-    {
-        super(cause);
-    }
+	public AudioInputException(Throwable cause)
+	{
+		super(cause);
+	}
 
-    public AudioInputException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+	public AudioInputException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+	{
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 }
